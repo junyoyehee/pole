@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figma Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-0:#08080B;--bg-1:#0E0E13;--bg-2:#141419;--bg-3:#1B1B22;--bg-4:#22222C;
+  --bg-hover:#282836;
+  --border-1:rgba(255,255,255,0.045);--border-2:rgba(255,255,255,0.08);--border-3:rgba(255,255,255,0.13);
+  --text-0:#F2F2F4;--text-1:#C8C8D0;--text-2:#8E8EA0;--text-3:#5A5A70;--text-4:#3E3E54;
+  --accent:#A78BFA;--accent-2:#C4B5FD;--accent-dim:rgba(167,139,250,0.10);--accent-glow:rgba(167,139,250,0.18);
+  --teal:#2DD4BF;--teal-dim:rgba(45,212,191,0.08);
+  --blue:#60A5FA;--blue-dim:rgba(96,165,250,0.08);
+  --green:#4ADE80;--green-dim:rgba(74,222,128,0.08);
+  --orange:#FB923C;--orange-dim:rgba(251,146,60,0.08);
+  --yellow:#FACC15;
+  --red:#F87171;--red-dim:rgba(248,113,113,0.08);
+  --r-sm:8px;--r-md:12px;--r-lg:18px;
+  --shadow-lg:0 8px 40px rgba(0,0,0,0.55);
+  --ease:cubic-bezier(0.4,0,0.2,1);
+  --font-display:'Outfit',sans-serif;--font-body:'Plus Jakarta Sans',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--bg-0);color:var(--text-0);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(var(--border-1) 1px,transparent 1px),linear-gradient(90deg,var(--border-1) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 70% 50% at 50% 0%,black 0%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 70% 50% at 50% 0%,black 0%,transparent 100%);}
+
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:99px;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(8,8,11,0.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-1);padding:0 40px;height:54px;display:flex;align-items:center;justify-content:space-between;}
+.nav-l{display:flex;align-items:center;gap:12px;}
+.nav-logo{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),#7C3AED);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:900;font-size:13px;color:white;box-shadow:0 0 16px var(--accent-glow);}
+.nav-t{font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:-0.3px;}
+.nav-t span{color:var(--text-3);font-weight:400;}
+.nav-env{font-size:9.5px;font-family:var(--font-mono);font-weight:500;color:var(--teal);background:var(--teal-dim);padding:3px 9px;border-radius:99px;border:1px solid rgba(45,212,191,0.1);}
+.nav-r{font-size:10.5px;font-family:var(--font-mono);color:var(--text-4);}
+
+/* HERO */
+.hero{position:relative;padding:60px 40px 0;z-index:1;text-align:center;display:flex;flex-direction:column;align-items:center;}
+.hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:700px;height:450px;background:radial-gradient(ellipse,var(--accent-glow) 0%,transparent 70%);pointer-events:none;z-index:0;opacity:0.45;}
+
+.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;font-family:var(--font-mono);color:var(--accent-2);background:var(--accent-dim);padding:5px 14px;border-radius:99px;border:1px solid rgba(167,139,250,0.1);margin-bottom:22px;position:relative;z-index:1;animation:fadeIn 0.5s var(--ease) both;}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.hero h1{font-family:var(--font-display);font-size:46px;font-weight:800;line-height:1.08;letter-spacing:-2px;margin-bottom:16px;position:relative;z-index:1;animation:fadeIn 0.5s var(--ease) 0.1s both;}
+.hero h1 .grad{background:linear-gradient(135deg,var(--accent-2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{font-size:15px;color:var(--text-2);line-height:1.65;max-width:460px;position:relative;z-index:1;animation:fadeIn 0.5s var(--ease) 0.2s both;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* URL INPUT */
+.hero-input{position:relative;z-index:1;width:100%;max-width:640px;margin-top:32px;animation:fadeIn 0.5s var(--ease) 0.3s both;}
+.hero-row{display:flex;gap:8px;align-items:center;}
+.hero-url-w{flex:1;position:relative;}
+.hero-url-ico{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-4);display:flex;}
+.hero-url{width:100%;height:50px;background:var(--bg-2);border:1px solid var(--border-2);border-radius:var(--r-md);padding:0 16px 0 42px;font-family:var(--font-mono);font-size:13px;color:var(--text-0);outline:none;transition:all 0.2s var(--ease);}
+.hero-url::placeholder{color:var(--text-4);}
+.hero-url:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim),var(--shadow-lg);}
+.hero-dep{height:50px;background:var(--bg-2);border:1px solid var(--border-2);border-radius:var(--r-md);padding:0 32px 0 14px;font-family:var(--font-body);font-size:13px;color:var(--text-0);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235A5A70' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:all 0.2s var(--ease);min-width:108px;}
+.hero-dep:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.hero-go{height:50px;padding:0 28px;background:linear-gradient(135deg,var(--accent),#7C3AED);border:none;border-radius:var(--r-md);color:white;font-family:var(--font-body);font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s var(--ease);display:flex;align-items:center;gap:7px;white-space:nowrap;}
+.hero-go:hover{transform:translateY(-2px);box-shadow:0 6px 24px var(--accent-glow);}
+.hero-go:active{transform:translateY(0);}
+.hero-hint{margin-top:10px;font-size:11px;color:var(--text-4);font-family:var(--font-mono);}
+.hero-hint kbd{font-size:9px;background:var(--bg-4);border:1px solid var(--border-1);border-radius:3px;padding:1px 5px;}
+
+/* FEATURES */
+.feats{position:relative;z-index:1;padding:52px 40px 0;display:flex;flex-direction:column;align-items:center;}
+.feats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:920px;}
+.feat{background:var(--bg-2);border:1px solid var(--border-1);border-radius:var(--r-md);padding:20px;transition:all 0.2s var(--ease);}
+.feat:hover{border-color:var(--border-2);background:var(--bg-3);transform:translateY(-2px);}
+.feat-ico{width:36px;height:36px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:16px;}
+.feat-name{font-size:13px;font-weight:700;margin-bottom:4px;}
+.feat-desc{font-size:11.5px;color:var(--text-3);line-height:1.55;}
+
+/* SECTION */
+.section{padding:48px 40px 0;position:relative;z-index:1;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.sec-title{font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:-0.3px;display:flex;align-items:center;gap:9px;}
+.sec-title .ico{width:26px;height:26px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;}
+.sec-count{font-size:10px;font-family:var(--font-mono);color:var(--text-4);background:var(--bg-3);padding:3px 9px;border-radius:99px;}
+.sec-link{font-size:11px;color:var(--accent);text-decoration:none;font-weight:600;display:flex;align-items:center;gap:4px;transition:all 0.15s;}
+.sec-link:hover{gap:6px;color:var(--accent-2);}
+
+/* PAGE CARD */
+.pg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+.pg-card{background:var(--bg-2);border:1px solid var(--border-1);border-radius:var(--r-lg);padding:24px;transition:all 0.25s var(--ease);cursor:pointer;position:relative;overflow:hidden;text-decoration:none;color:inherit;display:block;}
+.pg-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(167,139,250,0.06),transparent 60%);opacity:0;transition:opacity 0.3s;}
+.pg-card:hover{border-color:rgba(167,139,250,0.25);transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.pg-card:hover::before{opacity:1;}
+.pg-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.pg-ico{width:44px;height:44px;border-radius:var(--r-md);background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.pg-st{font-size:9.5px;font-weight:600;font-family:var(--font-mono);padding:3px 9px;border-radius:99px;letter-spacing:0.3px;color:var(--green);background:var(--green-dim);border:1px solid rgba(74,222,128,0.1);}
+.pg-name{font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:6px;letter-spacing:-0.2px;}
+.pg-desc{font-size:12.5px;color:var(--text-2);line-height:1.6;margin-bottom:14px;}
+.pg-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.pg-tag{font-size:9.5px;font-family:var(--font-mono);font-weight:500;padding:3px 8px;border-radius:99px;background:var(--bg-4);color:var(--text-3);border:1px solid var(--border-1);}
+.pg-foot{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border-1);}
+.pg-url{font-size:10.5px;font-family:var(--font-mono);color:var(--text-4);}
+.pg-arrow{width:26px;height:26px;border-radius:50%;background:var(--bg-4);display:flex;align-items:center;justify-content:center;color:var(--text-4);transition:all 0.2s var(--ease);}
+.pg-card:hover .pg-arrow{background:var(--accent-dim);color:var(--accent);transform:translateX(2px);}
+
+/* HISTORY */
+.hg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.hc{background:var(--bg-2);border:1px solid var(--border-1);border-radius:var(--r-md);padding:14px 16px;transition:all 0.2s var(--ease);cursor:pointer;position:relative;}
+.hc:hover{border-color:var(--border-2);background:var(--bg-3);transform:translateY(-1px);}
+.hc.starred{border-color:rgba(250,204,21,0.1);}
+.hc.starred::before{content:'★';position:absolute;top:11px;right:12px;color:var(--yellow);font-size:11px;opacity:0.6;}
+.hc-name{font-size:12.5px;font-weight:700;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:18px;}
+.hc-meta{display:flex;align-items:center;gap:7px;font-size:10px;font-family:var(--font-mono);color:var(--text-4);margin-bottom:8px;}
+.hc-key{color:var(--accent);opacity:0.55;}
+.hc-btns{display:flex;gap:5px;}
+.hc-btn{font-size:9.5px;font-weight:600;font-family:var(--font-body);padding:3px 9px;border-radius:99px;border:1px solid var(--border-2);background:transparent;color:var(--text-3);cursor:pointer;transition:all 0.15s var(--ease);}
+.hc-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.hc-btn.del:hover{border-color:var(--red);color:var(--red);background:var(--red-dim);}
+.hc-btn.copied{border-color:var(--teal);color:var(--teal);background:var(--teal-dim);}
+
+.hc-empty{grid-column:1/-1;text-align:center;padding:44px 20px;color:var(--text-4);font-size:12px;}
+.hc-empty svg{margin-bottom:10px;opacity:0.2;}
+
+/* FOOTER */
+.footer{padding:40px;border-top:1px solid var(--border-1);display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:var(--text-4);position:relative;z-index:1;margin-top:48px;}
+
+/* TOAST */
+.toast-ctr{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:6px;}
+.toast{padding:8px 14px;background:var(--bg-4);border:1px solid var(--teal);border-radius:var(--r-md);color:var(--teal);font-size:11px;font-weight:500;display:flex;align-items:center;gap:6px;box-shadow:var(--shadow-lg);animation:toastIn 0.25s ease,toastOut 0.25s ease 1.7s forwards;}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(-6px)}}
+
+.stagger-1{animation:fadeIn 0.5s var(--ease) 0.2s both;}
+.stagger-2{animation:fadeIn 0.5s var(--ease) 0.3s both;}
+.stagger-3{animation:fadeIn 0.5s var(--ease) 0.4s both;}
+
+@media(max-width:768px){
+  .nav{padding:0 20px;}.hero{padding:40px 20px 0;}.hero h1{font-size:30px;letter-spacing:-1px;}
+  .feats-grid{grid-template-columns:1fr 1fr;}.section{padding:36px 20px 0;}
+  .pg-grid{grid-template-columns:1fr;}.hg{grid-template-columns:1fr;}.footer{padding:28px 20px;}
+}
+@media(max-width:480px){.feats-grid{grid-template-columns:1fr;}.hero-row{flex-direction:column;}.hero-dep,.hero-go{width:100%;}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-l">
+    <div class="nav-logo">F</div>
+    <div class="nav-t">Figma Explorer <span>— Home</span></div>
+    <div class="nav-env">localhost:3000</div>
+  </div>
+  <div class="nav-r" id="clock"></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span class="dot"></span> Figma × Claude Code MCP</div>
+  <h1>Figma 파일을<br><span class="grad">구조부터 탐색</span></h1>
+  <p>URL 하나로 노드 트리를 시각화하고, Node ID·MCP 명령어·Figma URL을 즉시 복사해 Claude Code와 바로 연동하세요.</p>
+
+  <div class="hero-input">
+    <div class="hero-row">
+      <div class="hero-url-w">
+        <span class="hero-url-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+        <input type="text" class="hero-url" id="heroUrl" placeholder="https://figma.com/design/ABC123/MyFile?node-id=42-15">
+      </div>
+      <select class="hero-dep" id="heroDep">
+        <option value="1">깊이 1</option>
+        <option value="2" selected>깊이 2</option>
+        <option value="3">깊이 3</option>
+        <option value="4">깊이 4</option>
+        <option value="">전체</option>
+      </select>
+      <button class="hero-go" onclick="goExplore()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        탐색 시작
+      </button>
+    </div>
+    <div class="hero-hint"><kbd>Enter</kbd> 키로 바로 Explorer 페이지로 이동합니다</div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="feats stagger-1">
+  <div class="feats-grid">
+    <div class="feat">
+      <div class="feat-ico" style="background:var(--accent-dim)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 3v18"/><path d="M3 12h18"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      </div>
+      <div class="feat-name">노드 트리 탐색</div>
+      <div class="feat-desc">페이지·프레임·컴포넌트를 깊이별로 펼치며 구조 파악</div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico" style="background:var(--teal-dim)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </div>
+      <div class="feat-name">3종 원클릭 복사</div>
+      <div class="feat-desc">Node ID · MCP 명령어 · Figma URL 버튼 하나로 복사</div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico" style="background:var(--blue-dim)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
+      <div class="feat-name">검색 & 타입 필터</div>
+      <div class="feat-desc">이름으로 검색, FRAME·COMPONENT 등 타입별 필터링</div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico" style="background:var(--green-dim)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <div class="feat-name">Claude Code 연동</div>
+      <div class="feat-desc">MCP 명령어 복사 → Claude Code에 붙여넣기로 바로 조회</div>
+    </div>
+  </div>
+</section>
+
+<!-- PAGES -->
+<section class="section stagger-2" id="pages">
+  <div class="sec-head">
+    <div class="sec-title">
+      <div class="ico" style="background:var(--accent-dim)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </div>
+      사용 가능한 페이지
+    </div>
+  </div>
+  <div class="pg-grid">
+    <a href="figma-explorer-v2.html" class="pg-card">
+      <div class="pg-head">
+        <div class="pg-ico">🔍</div>
+        <span class="pg-st">LIVE</span>
+      </div>
+      <div class="pg-name">Figma Explorer</div>
+      <div class="pg-desc">Figma 파일의 노드 구조를 트리로 탐색하고, Node ID·MCP 명령어·Figma URL을 복사. 다중 선택, 검색, 타입 필터, 키보드 내비게이션, 북마크, 우클릭 컨텍스트 메뉴, RAW JSON 뷰 지원.</div>
+      <div class="pg-tags">
+        <span class="pg-tag">Figma API</span>
+        <span class="pg-tag">MCP</span>
+        <span class="pg-tag">Tree View</span>
+        <span class="pg-tag">Claude Code</span>
+        <span class="pg-tag">Keyboard Nav</span>
+      </div>
+      <div class="pg-foot">
+        <span class="pg-url">/figma-explorer</span>
+        <div class="pg-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section class="section stagger-3" id="history">
+  <div class="sec-head">
+    <div class="sec-title">
+      <div class="ico" style="background:var(--teal-dim)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+      </div>
+      최근 탐색 히스토리
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="sec-count" id="histCnt">0개</div>
+      <a href="figma-explorer-v2.html" class="sec-link">Explorer에서 전체 보기 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></a>
+    </div>
+  </div>
+  <div class="hg" id="histGrid"></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span>Figma Explorer &middot; Wemade Internal</span>
+  <span style="font-family:var(--font-mono)">localhost:3000</span>
+</footer>
+
+<div class="toast-ctr" id="toastCtr"></div>
+
+<script>
+// ═══ HISTORY ═══
+function getHist(){try{return JSON.parse(localStorage.getItem('fex-hist')||'[]')}catch{return[]}}
+function setHist(h){localStorage.setItem('fex-hist',JSON.stringify(h))}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function fmtT(ts){const d=Date.now()-ts;if(d<60000)return'방금';if(d<3600000)return Math.floor(d/60000)+'분 전';if(d<86400000)return Math.floor(d/3600000)+'시간 전';if(d<604800000)return Math.floor(d/86400000)+'일 전';const dt=new Date(ts);return(dt.getMonth()+1)+'/'+dt.getDate();}
+
+function renderHist(){
+  const h=getHist();
+  document.getElementById('histCnt').textContent=h.length+'개';
+  const g=document.getElementById('histGrid');
+  if(!h.length){
+    g.innerHTML=`<div class="hc-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg><div>아직 탐색 기록이 없습니다</div><div style="margin-top:4px;font-size:11px">위 입력란에서 Figma URL로 탐색을 시작하세요</div></div>`;
+    return;
+  }
+  const sorted=[...h].sort((a,b)=>(b.starred?1:0)-(a.starred?1:0)||b.ts-a.ts);
+  g.innerHTML=sorted.slice(0,12).map(x=>{
+    const ri=h.findIndex(r=>r.fileKey===x.fileKey&&r.ts===x.ts);
+    return`<div class="hc ${x.starred?'starred':''}" onclick="openEx('${x.fileKey}','${x.nodeId||''}','${esc(x.name||'')}')">
+      <div class="hc-name">${esc(x.name||'Untitled')}</div>
+      <div class="hc-meta"><span class="hc-key">${x.fileKey.slice(0,10)}…</span><span>${fmtT(x.ts)}</span>${x.nodeId?`<span>node:${x.nodeId}</span>`:''}</div>
+      <div class="hc-btns">
+        <button class="hc-btn" onclick="event.stopPropagation();cpK('${x.fileKey}',this)">Key 복사</button>
+        <button class="hc-btn" onclick="event.stopPropagation();cpM('${x.fileKey}','${x.nodeId||''}',this)">MCP 복사</button>
+        <button class="hc-btn del" onclick="event.stopPropagation();rmH(${ri})">삭제</button>
+      </div>
+    </div>`;
+  }).join('');
+  if(h.length>12) g.innerHTML+=`<div style="grid-column:1/-1;text-align:center;padding:10px"><a href="figma-explorer-v2.html" style="color:var(--accent);font-size:11px;text-decoration:none">전체 ${h.length}개 보기 →</a></div>`;
+}
+
+function openEx(fk,nid,name){
+  const url=`https://www.figma.com/design/${fk}/${encodeURIComponent(name||'f')}${nid?'?node-id='+nid:''}`;
+  window.location.href=`figma-explorer-v2.html?url=${encodeURIComponent(url)}`;
+}
+function cpK(k,b){navigator.clipboard.writeText(k);b.classList.add('copied');b.textContent='복사됨!';toast('fileKey 복사됨');setTimeout(()=>{b.classList.remove('copied');b.textContent='Key 복사'},1200);}
+function cpM(fk,nid,b){const c=nid?`get_figma_data(fileKey="${fk}", nodeId="${nid}")`:`get_figma_data(fileKey="${fk}")`;navigator.clipboard.writeText(c);b.classList.add('copied');b.textContent='복사됨!';toast('MCP 명령어 복사됨');setTimeout(()=>{b.classList.remove('copied');b.textContent='MCP 복사'},1200);}
+function rmH(i){const h=getHist();h.splice(i,1);setHist(h);renderHist();toast('삭제됨');}
+
+// ═══ GO ═══
+function goExplore(){
+  const url=document.getElementById('heroUrl').value.trim();
+  if(!url){toast('Figma URL을 입력해주세요');return;}
+  window.location.href=`figma-explorer-v2.html?url=${encodeURIComponent(url)}`;
+}
+document.getElementById('heroUrl').addEventListener('keydown',e=>{if(e.key==='Enter')goExplore()});
+
+// ═══ TOAST ═══
+function toast(m){const c=document.getElementById('toastCtr');const t=document.createElement('div');t.className='toast';t.innerHTML=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>${esc(m)}`;c.appendChild(t);setTimeout(()=>t.remove(),2100);}
+
+// ═══ CLOCK ═══
+function tick(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
+tick();setInterval(tick,1000);
+
+// ═══ INIT ═══
+renderHist();
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+.content {
+  padding: 16px;
+}
+
+/* Page Header */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.pageTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pageSubtitle {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.btnPrimary {
+  padding: 5px 10px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  transition: var(--transition);
+  background: linear-gradient(135deg, var(--accent), #7C3AED);
+  color: #fff;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.22);
+}
+
+/* Filter Bar */
+.filterBar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filterTab {
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: var(--transition);
+}
+
+.filterTab:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.filterTabActive {
+  background: var(--accent-dim);
+  color: var(--accent-bright);
+  font-weight: 600;
+}
+
+.filterTabActive:hover {
+  background: var(--accent-dim);
+  color: var(--accent-bright);
+}
+
+.searchWrap {
+  position: relative;
+  margin-left: auto;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  padding: 5px 10px 5px 26px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  width: 180px;
+  outline: none;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: var(--transition);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.searchInput:focus {
+  border-color: rgba(167, 139, 250, 0.5);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+/* Review List */
+.reviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reviewCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.reviewCard:hover {
+  border-color: var(--border-medium);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+  background: var(--bg-hover);
+}
+
+.cardTop {
+  margin-bottom: 8px;
+}
+
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.cardTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cardDescription {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+/* Status Badge */
+.statusBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.statusInProgress {
+  background: var(--orange-dim);
+  color: var(--orange);
+}
+
+.statusRevision {
+  background: var(--yellow-dim);
+  color: var(--yellow);
+}
+
+.statusApproved {
+  background: var(--green-dim);
+  color: var(--green);
+}
+
+/* Card Meta */
+.cardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.metaLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.metaRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+/* Figma Tag */
+.figmaTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+/* Requester Avatar */
+.requesterAvatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* Reviewer Avatars (stacked) */
+.reviewerAvatars {
+  display: flex;
+  flex-direction: row;
+}
+
+.reviewerAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: -5px;
+  border: 2px solid var(--bg-secondary);
+  position: relative;
+  transition: var(--transition);
+}
+
+.reviewerAvatar:first-child {
+  margin-left: 0;
+}
+
+.reviewCard:hover .reviewerAvatar {
+  border-color: var(--bg-hover);
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+}

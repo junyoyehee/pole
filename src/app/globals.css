@@ -1,26 +1,69 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #0C0C0F;
+  --bg-secondary: #131317;
+  --bg-tertiary: #1A1A20;
+  --bg-elevated: #202028;
+  --bg-hover: #24242E;
+  --bg-active: #2A2A36;
+  --border-subtle: rgba(255,255,255,0.05);
+  --border-medium: rgba(255,255,255,0.09);
+  --border-focus: rgba(167,139,250,0.5);
+  --text-primary: #EDEDF0;
+  --text-secondary: #9898A6;
+  --text-tertiary: #5C5C72;
+  --text-muted: #44445A;
+  --accent: #A78BFA;
+  --accent-bright: #C4B5FD;
+  --accent-dim: rgba(167,139,250,0.12);
+  --accent-glow: rgba(167,139,250,0.22);
+  --teal: #2DD4BF;
+  --teal-dim: rgba(45,212,191,0.10);
+  --blue: #60A5FA;
+  --blue-dim: rgba(96,165,250,0.10);
+  --green: #4ADE80;
+  --green-dim: rgba(74,222,128,0.10);
+  --orange: #FB923C;
+  --orange-dim: rgba(251,146,60,0.10);
+  --pink: #F472B6;
+  --pink-dim: rgba(244,114,182,0.10);
+  --yellow: #FACC15;
+  --yellow-dim: rgba(250,204,21,0.08);
+  --cyan: #22D3EE;
+  --cyan-dim: rgba(34,211,238,0.10);
+  --indigo: #818CF8;
+  --indigo-dim: rgba(129,140,248,0.10);
+  --red: #F87171;
+  --red-dim: rgba(248,113,113,0.10);
+  --gray-badge: #71717A;
+  --gray-badge-dim: rgba(113,113,122,0.12);
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+  --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* Mantine overrides for dark theme */
+.mantine-AppShell-root {
+  background: var(--bg-primary);
 }

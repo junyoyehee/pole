@@ -1,0 +1,92 @@
+.content {
+  padding: 24px;
+  flex: 1;
+  max-width: 800px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.heroIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--accent, #A78BFA);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pageSubtitle {
+  font-size: 10px;
+  color: var(--text-secondary, #8B8FA3);
+  margin-top: 2px;
+}
+
+.toolGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.toolCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  background: var(--bg-card, #1A1A2E);
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.toolCard:hover {
+  border-color: var(--accent, #A78BFA);
+  background: var(--bg-card-hover, #1E2D4F);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.toolIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toolTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.toolDesc {
+  font-size: 10px;
+  color: var(--text-secondary, #8B8FA3);
+  line-height: 1.5;
+}
+
+.toolArrow {
+  font-size: 9px;
+  font-weight: 600;
+  margin-top: auto;
+  padding-top: 4px;
+}

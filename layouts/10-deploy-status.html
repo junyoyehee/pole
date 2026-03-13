@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 배포 현황</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--border-medium); border-radius:99px; }
+    ::-webkit-scrollbar-thumb:hover { background:var(--text-tertiary); }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); position: fixed; top: 0; left: 0; bottom: 0; }
+    .sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; height: 56px; }
+    .sidebar-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 0 16px var(--accent-glow); }
+    .sidebar-title { font-size: 16px; font-weight: 700; }
+    .main { flex: 1; margin-left: 240px; }
+    .header { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: relative; }
+    .header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--accent-glow),transparent); }
+    .breadcrumb { font-size: 13px; color: var(--text-tertiary); }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+    .content { padding: 20px; }
+
+    .btn { padding: 8px 14px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); }
+    .btn-light { background: var(--bg-elevated); border: 1px solid var(--border-medium); color: var(--text-secondary); }
+    .btn-light:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #7C3AED); color: white; border: none; border-radius: var(--radius-md); height: 38px; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 18px var(--accent-glow); }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .page-title { font-size: 20px; font-weight: 700; }
+
+    /* Deploy Board */
+    .deploy-board { display: flex; flex-direction: column; gap: 14px; }
+
+    .deploy-project { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; }
+    .project-row { padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
+    .project-name { font-size: 15px; font-weight: 700; width: 180px; flex-shrink: 0; }
+    .env-cards { display: flex; gap: 12px; flex: 1; }
+
+    .env-card { flex: 1; padding: 12px 14px; border: 1px solid var(--border-medium); border-radius: var(--radius-md); position: relative; background: var(--bg-tertiary); }
+    .env-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-family: var(--font-mono); }
+    .env-label.dev { color: var(--blue); }
+    .env-label.stg { color: var(--orange); }
+    .env-label.prod { color: var(--green); }
+    .env-version { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .env-status { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .status-dot.success { background: var(--green); }
+    .status-dot.failed { background: var(--red); }
+    .status-dot.rollback { background: var(--orange); }
+    .env-meta { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; }
+
+    /* Deploy History */
+    .history-section { margin-top: 24px; }
+    .history-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+    .history-table { width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; border-collapse: collapse; }
+    .history-table th { padding: 10px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text-tertiary); background: var(--bg-tertiary); border-bottom: 1px solid var(--border-subtle); }
+    .history-table td { padding: 10px 16px; font-size: 13px; border-bottom: 1px solid var(--border-subtle); }
+    .history-table tr:last-child td { border-bottom: none; }
+    .history-table tr:hover td { background: var(--bg-hover); }
+
+    .env-badge { padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+    .env-badge.dev { background: var(--blue-dim); color: var(--blue); }
+    .env-badge.stg { background: var(--orange-dim); color: var(--orange); }
+    .env-badge.prod { background: var(--green-dim); color: var(--green); }
+
+    .status-badge { padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+    .status-badge.success { background: var(--green-dim); color: var(--green); }
+    .status-badge.failed { background: var(--red-dim); color: var(--red); }
+    .status-badge.rollback { background: var(--orange-dim); color: var(--orange); }
+
+    .deployer { display: flex; align-items: center; gap: 6px; }
+    .deployer-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: var(--text-secondary); }
+    .changes-preview { font-size: 12px; color: var(--text-secondary); max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">P</div><span class="sidebar-title">Pole</span></div>
+    </aside>
+    <main class="main">
+      <header class="header">
+        <div class="breadcrumb">개발 도구 / <span class="current">배포 현황</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-primary">+ 배포 기록</button>
+        </div>
+      </header>
+      <div class="content">
+        <div class="page-header">
+          <div>
+            <div class="page-title">배포 현황</div>
+            <div style="font-size:12px;color:var(--text-tertiary);margin-top:2px">프로젝트별 환경 배포 상태</div>
+          </div>
+        </div>
+
+        <div class="deploy-board">
+          <!-- Project 1 -->
+          <div class="deploy-project">
+            <div class="project-row">
+              <div class="project-name">미르M 플랫폼</div>
+              <div class="env-cards">
+                <div class="env-card">
+                  <div class="env-label dev">Development</div>
+                  <div class="env-version">v1.3.0</div>
+                  <div class="env-status"><span class="status-dot success"></span> 성공</div>
+                  <div class="env-meta">박영호 · 2시간 전</div>
+                </div>
+                <div class="env-card">
+                  <div class="env-label stg">Staging</div>
+                  <div class="env-version">v1.2.5</div>
+                  <div class="env-status"><span class="status-dot success"></span> 성공</div>
+                  <div class="env-meta">박영호 · 1일 전</div>
+                </div>
+                <div class="env-card">
+                  <div class="env-label prod">Production</div>
+                  <div class="env-version">v1.2.3</div>
+                  <div class="env-status"><span class="status-dot success"></span> 성공</div>
+                  <div class="env-meta">박영호 · 3일 전</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 2 -->
+          <div class="deploy-project">
+            <div class="project-row">
+              <div class="project-name">Pole 인트라넷</div>
+              <div class="env-cards">
+                <div class="env-card">
+                  <div class="env-label dev">Development</div>
+                  <div class="env-version">v2.1.0</div>
+                  <div class="env-status"><span class="status-dot success"></span> 성공</div>
+                  <div class="env-meta">일달러 · 30분 전</div>
+                </div>
+                <div class="env-card" style="border-color:var(--orange-dim)">
+                  <div class="env-label stg">Staging</div>
+                  <div class="env-version">v2.0.8</div>
+                  <div class="env-status"><span class="status-dot failed"></span> <span style="color:var(--red);font-weight:600">실패</span></div>
+                  <div class="env-meta">일달러 · 5시간 전</div>
+                </div>
+                <div class="env-card">
+                  <div class="env-label prod">Production</div>
+                  <div class="env-version">v2.0.5</div>
+                  <div class="env-status"><span class="status-dot success"></span> 성공</div>
+                  <div class="env-meta">박영호 · 1주 전</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 3 -->
+          <div class="deploy-project">
+            <div class="project-row">
+              <div class="project-name">관리자 백오피스</div>
+              <div class="env-cards">
+                <div class="env-card">
+                  <div class="env-label dev">Development</div>
+                  <div class="env-version">v0.9.2</div>
+                  <div class="env-status"><span class="status-dot success"></span> 성공</div>
+                  <div class="env-meta">김민수 · 1일 전</div>
+                </div>
+                <div class="env-card">
+                  <div class="env-label stg">Staging</div>
+                  <div class="env-version">v0.9.0</div>
+                  <div class="env-status"><span class="status-dot rollback"></span> <span style="color:var(--orange);font-weight:600">롤백</span></div>
+                  <div class="env-meta">김민수 · 2일 전</div>
+                </div>
+                <div class="env-card">
+                  <div class="env-label prod">Production</div>
+                  <div class="env-version">v0.8.5</div>
+                  <div class="env-status"><span class="status-dot success"></span> 성공</div>
+                  <div class="env-meta">박영호 · 2주 전</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deploy History -->
+        <div class="history-section">
+          <div class="history-title">최근 배포 이력</div>
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>프로젝트</th>
+                <th>환경</th>
+                <th>버전</th>
+                <th>상태</th>
+                <th>배포자</th>
+                <th>변경사항</th>
+                <th>배포일시</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:500">Pole 인트라넷</td>
+                <td><span class="env-badge dev">DEV</span></td>
+                <td>v2.1.0</td>
+                <td><span class="status-badge success">성공</span></td>
+                <td><div class="deployer"><div class="deployer-avatar">일</div> 일달러</div></td>
+                <td class="changes-preview">대시보드 위젯 추가, 알림 시스템 연동</td>
+                <td style="color:var(--text-tertiary);font-size:12px">03.13 14:32</td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">미르M 플랫폼</td>
+                <td><span class="env-badge dev">DEV</span></td>
+                <td>v1.3.0</td>
+                <td><span class="status-badge success">성공</span></td>
+                <td><div class="deployer"><div class="deployer-avatar">박</div> 박영호</div></td>
+                <td class="changes-preview">로그인 API 리팩토링, JWT 갱신 로직 개선</td>
+                <td style="color:var(--text-tertiary);font-size:12px">03.13 11:20</td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">Pole 인트라넷</td>
+                <td><span class="env-badge stg">STG</span></td>
+                <td>v2.0.8</td>
+                <td><span class="status-badge failed">실패</span></td>
+                <td><div class="deployer"><div class="deployer-avatar">일</div> 일달러</div></td>
+                <td class="changes-preview">DB 마이그레이션 충돌로 롤백 필요</td>
+                <td style="color:var(--text-tertiary);font-size:12px">03.13 09:15</td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">미르M 플랫폼</td>
+                <td><span class="env-badge stg">STG</span></td>
+                <td>v1.2.5</td>
+                <td><span class="status-badge success">성공</span></td>
+                <td><div class="deployer"><div class="deployer-avatar">박</div> 박영호</div></td>
+                <td class="changes-preview">Figma 허브 페이지 추가</td>
+                <td style="color:var(--text-tertiary);font-size:12px">03.12 16:45</td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">관리자 백오피스</td>
+                <td><span class="env-badge stg">STG</span></td>
+                <td>v0.9.0</td>
+                <td><span class="status-badge rollback">롤백</span></td>
+                <td><div class="deployer"><div class="deployer-avatar">김</div> 김민수</div></td>
+                <td class="changes-preview">권한 시스템 변경 후 사이드이펙트 발생</td>
+                <td style="color:var(--text-tertiary);font-size:12px">03.11 14:00</td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">미르M 플랫폼</td>
+                <td><span class="env-badge prod">PROD</span></td>
+                <td>v1.2.3</td>
+                <td><span class="status-badge success">성공</span></td>
+                <td><div class="deployer"><div class="deployer-avatar">박</div> 박영호</div></td>
+                <td class="changes-preview">핫픽스: 로그인 세션 타임아웃 수정</td>
+                <td style="color:var(--text-tertiary);font-size:12px">03.10 10:30</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

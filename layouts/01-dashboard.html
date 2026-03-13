@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 팀 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    .app-shell { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); position: fixed; top: 0; left: 0; bottom: 0; display: flex; flex-direction: column; z-index: 100; }
+    .sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; height: 56px; }
+    .sidebar-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 13px; box-shadow: 0 0 16px var(--accent-glow); }
+    .sidebar-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .sidebar-nav { flex: 1; padding: 8px; overflow-y: auto; }
+    .nav-section { margin-bottom: 16px; }
+    .nav-section-title { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 10px; margin-bottom: 2px; }
+    .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 13px; cursor: pointer; text-decoration: none; transition: var(--transition); }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .nav-item.active { background: var(--accent-dim); color: var(--accent-bright); font-weight: 600; }
+    .nav-icon { width: 18px; text-align: center; font-size: 14px; }
+    .nav-badge { margin-left: auto; background: var(--red-dim); color: var(--red); font-size: 10px; font-family: var(--font-mono); padding: 1px 6px; border-radius: 99px; font-weight: 600; }
+    .sidebar-footer { padding: 8px; border-top: 1px solid var(--border-subtle); }
+    .user-card { display: flex; align-items: center; gap: 9px; padding: 8px; border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); }
+    .user-card:hover { background: var(--bg-hover); }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-dim); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--accent); flex-shrink: 0; }
+    .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .user-role { font-size: 11px; color: var(--text-tertiary); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; margin-left: auto; }
+    .status-dot.online { background: var(--green); }
+
+    /* Main */
+    .main { flex: 1; margin-left: 240px; display: flex; flex-direction: column; }
+    .header { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: sticky; top: 0; z-index: 50; }
+    .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-glow), transparent); }
+    .breadcrumb { font-size: 13px; color: var(--text-tertiary); }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .icon-btn { width: 34px; height: 34px; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; font-size: 16px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; position: relative; transition: var(--transition); }
+    .icon-btn:hover { background: var(--bg-hover); }
+    .noti-dot { width: 7px; height: 7px; background: var(--red); border-radius: 50%; position: absolute; top: 6px; right: 6px; }
+
+    .content { padding: 20px; flex: 1; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .page-title { font-size: 20px; font-weight: 700; }
+    .page-subtitle { font-size: 13px; color: var(--text-tertiary); margin-top: 2px; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px 18px; transition: var(--transition); }
+    .stat-card:hover { border-color: var(--border-medium); }
+    .stat-icon { font-size: 20px; margin-bottom: 8px; }
+    .stat-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px; }
+    .stat-value { font-size: 26px; font-weight: 700; }
+    .stat-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+    .stat-sub .up { color: var(--green); }
+
+    /* Grid */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .grid-3-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden; }
+    .card-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 14px; font-weight: 600; }
+    .card-link { font-size: 12px; color: var(--accent); text-decoration: none; transition: var(--transition); }
+    .card-link:hover { color: var(--accent-bright); }
+    .card-body { padding: 14px 16px; }
+
+    /* Progress Bars */
+    .project-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+    .project-row:last-child { border-bottom: none; }
+    .project-name { font-size: 13px; font-weight: 500; width: 140px; flex-shrink: 0; }
+    .progress-bar { flex: 1; height: 8px; background: var(--bg-elevated); border-radius: var(--radius-xs); overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: var(--radius-xs); }
+    .progress-fill.blue { background: var(--blue); }
+    .progress-fill.green { background: var(--green); }
+    .progress-fill.violet { background: var(--accent); }
+    .progress-pct { font-size: 12px; color: var(--text-secondary); font-weight: 600; width: 36px; text-align: right; font-family: var(--font-mono); }
+
+    /* Review Item */
+    .review-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-subtle); }
+    .review-item:last-child { border-bottom: none; }
+    .review-thumb { width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .review-info { flex: 1; min-width: 0; }
+    .review-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .review-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+    .badge-open { background: var(--yellow-dim); color: var(--yellow); }
+    .badge-approved { background: var(--green-dim); color: var(--green); }
+    .badge-revision { background: var(--red-dim); color: var(--red); }
+
+    /* Activity Feed */
+    .activity-item { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border-subtle); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0; }
+    .activity-text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+    .activity-text strong { color: var(--text-primary); }
+    .activity-time { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+
+    /* Team Status */
+    .team-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .team-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .team-dot.working { background: var(--green); }
+    .team-dot.meeting { background: var(--yellow); }
+    .team-dot.away { background: var(--gray-badge); }
+    .team-dot.vacation { background: var(--red); }
+    .team-name { font-size: 12px; flex: 1; color: var(--text-secondary); }
+    .team-part { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
+
+    /* Notice */
+    .notice-item { padding: 9px 0; border-bottom: 1px solid var(--border-subtle); }
+    .notice-item:last-child { border-bottom: none; }
+    .notice-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .notice-date { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: var(--font-mono); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">P</div>
+        <span class="sidebar-title">Pole</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">메인</div>
+          <a class="nav-item active" href="#"><span class="nav-icon">📊</span> 대시보드</a>
+          <a class="nav-item" href="#"><span class="nav-icon">✅</span> 내 업무 <span class="nav-badge">3</span></a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Figma</div>
+          <a class="nav-item" href="#"><span class="nav-icon">🎨</span> 디자인 허브</a>
+          <a class="nav-item" href="#"><span class="nav-icon">💬</span> 디자인 리뷰 <span class="nav-badge">2</span></a>
+          <a class="nav-item" href="#"><span class="nav-icon">🔍</span> Figma 탐색기</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">프로젝트</div>
+          <a class="nav-item" href="#"><span class="nav-icon">📁</span> 프로젝트</a>
+          <a class="nav-item" href="#"><span class="nav-icon">📅</span> 타임라인</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">소통</div>
+          <a class="nav-item" href="#"><span class="nav-icon">📢</span> 공지사항</a>
+          <a class="nav-item" href="#"><span class="nav-icon">📋</span> 팀 게시판</a>
+          <a class="nav-item" href="#"><span class="nav-icon">📝</span> 회의록</a>
+          <a class="nav-item" href="#"><span class="nav-icon">📖</span> 위키</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">도구</div>
+          <a class="nav-item" href="#"><span class="nav-icon">💻</span> 코드 스니펫</a>
+          <a class="nav-item" href="#"><span class="nav-icon">🚀</span> 배포 현황</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">관리</div>
+          <a class="nav-item" href="#"><span class="nav-icon">👥</span> 팀원 관리</a>
+          <a class="nav-item" href="#"><span class="nav-icon">⚙️</span> 설정</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-card">
+          <div class="user-avatar">일</div>
+          <div style="flex:1">
+            <div class="user-name">일달러</div>
+            <div class="user-role">Frontend Lead</div>
+          </div>
+          <div class="status-dot online"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="header">
+        <div class="breadcrumb"><span class="current">대시보드</span></div>
+        <div class="header-actions">
+          <button class="icon-btn">🔍</button>
+          <button class="icon-btn">🔔<span class="noti-dot"></span></button>
+          <button class="icon-btn">🌙</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="page-header">
+          <div>
+            <div class="page-title">안녕하세요, 일달러님 👋</div>
+            <div class="page-subtitle">2026년 3월 13일 목요일 · 팀 현황을 확인하세요</div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📁</div>
+            <div class="stat-label">진행중 프로젝트</div>
+            <div class="stat-value">3</div>
+            <div class="stat-sub">전체 5개 중</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💬</div>
+            <div class="stat-label">리뷰 대기</div>
+            <div class="stat-value">7</div>
+            <div class="stat-sub">디자인 4 · 업무 3</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⏰</div>
+            <div class="stat-label">이번 주 마감</div>
+            <div class="stat-value">5</div>
+            <div class="stat-sub">내 업무 2건 포함</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">팀원 현황</div>
+            <div class="stat-value">18<span style="font-size:14px;color:var(--text-tertiary);font-weight:400">/20</span></div>
+            <div class="stat-sub">2명 휴가</div>
+          </div>
+        </div>
+
+        <!-- Project Progress + Reviews -->
+        <div class="grid-3-1">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">프로젝트 진행률</span>
+              <a href="#" class="card-link">전체보기</a>
+            </div>
+            <div class="card-body">
+              <div class="project-row">
+                <span class="project-name">미르M 리뉴얼</span>
+                <div class="progress-bar"><div class="progress-fill blue" style="width:72%"></div></div>
+                <span class="progress-pct">72%</span>
+              </div>
+              <div class="project-row">
+                <span class="project-name">관리자 대시보드</span>
+                <div class="progress-bar"><div class="progress-fill green" style="width:45%"></div></div>
+                <span class="progress-pct">45%</span>
+              </div>
+              <div class="project-row">
+                <span class="project-name">디자인 시스템 v2</span>
+                <div class="progress-bar"><div class="progress-fill violet" style="width:88%"></div></div>
+                <span class="progress-pct">88%</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">최근 디자인 리뷰</span>
+              <a href="#" class="card-link">전체보기</a>
+            </div>
+            <div class="card-body">
+              <div class="review-item">
+                <div class="review-thumb">🎨</div>
+                <div class="review-info">
+                  <div class="review-title">로그인 화면 v3</div>
+                  <div class="review-meta">김디자 · 2시간 전</div>
+                </div>
+                <span class="badge badge-open">리뷰중</span>
+              </div>
+              <div class="review-item">
+                <div class="review-thumb">🖼️</div>
+                <div class="review-info">
+                  <div class="review-title">메인 대시보드 레이아웃</div>
+                  <div class="review-meta">박디자 · 어제</div>
+                </div>
+                <span class="badge badge-revision">수정요청</span>
+              </div>
+              <div class="review-item">
+                <div class="review-thumb">✨</div>
+                <div class="review-info">
+                  <div class="review-title">Button 컴포넌트 변경</div>
+                  <div class="review-meta">김디자 · 2일 전</div>
+                </div>
+                <span class="badge badge-approved">승인</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity + Notice + Team -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 220px;gap:12px">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">최근 활동</span>
+            </div>
+            <div class="card-body">
+              <div class="activity-item">
+                <div class="activity-avatar">김</div>
+                <div>
+                  <div class="activity-text"><strong>김민수</strong>가 <strong>로그인 화면</strong> 핸드오프를 완료했습니다</div>
+                  <div class="activity-time">15분 전</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-avatar">이</div>
+                <div>
+                  <div class="activity-text"><strong>이영희</strong>가 <strong>API 연동</strong> 업무를 진행중으로 변경했습니다</div>
+                  <div class="activity-time">1시간 전</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-avatar">박</div>
+                <div>
+                  <div class="activity-text"><strong>박디자</strong>가 <strong>메인 대시보드</strong> 디자인 리뷰를 요청했습니다</div>
+                  <div class="activity-time">2시간 전</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-avatar">최</div>
+                <div>
+                  <div class="activity-text"><strong>최지은</strong>이 주간 스프린트 회의록을 작성했습니다</div>
+                  <div class="activity-time">3시간 전</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">공지사항</span>
+              <a href="#" class="card-link">전체보기</a>
+            </div>
+            <div class="card-body">
+              <div class="notice-item">
+                <div class="notice-title">📌 3월 배포 일정 안내</div>
+                <div class="notice-date">2026.03.12</div>
+              </div>
+              <div class="notice-item">
+                <div class="notice-title">디자인 시스템 v2 마이그레이션 가이드</div>
+                <div class="notice-date">2026.03.10</div>
+              </div>
+              <div class="notice-item">
+                <div class="notice-title">코드리뷰 가이드라인 업데이트</div>
+                <div class="notice-date">2026.03.08</div>
+              </div>
+              <div class="notice-item">
+                <div class="notice-title">3/15(토) 서버 점검 안내</div>
+                <div class="notice-date">2026.03.06</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">팀원 상태</span>
+            </div>
+            <div class="card-body">
+              <div class="team-item"><div class="team-dot working"></div><span class="team-name">일달러</span><span class="team-part">FE</span></div>
+              <div class="team-item"><div class="team-dot working"></div><span class="team-name">김민수</span><span class="team-part">FE</span></div>
+              <div class="team-item"><div class="team-dot meeting"></div><span class="team-name">이영희</span><span class="team-part">BE</span></div>
+              <div class="team-item"><div class="team-dot working"></div><span class="team-name">김디자</span><span class="team-part">Design</span></div>
+              <div class="team-item"><div class="team-dot working"></div><span class="team-name">박디자</span><span class="team-part">Design</span></div>
+              <div class="team-item"><div class="team-dot away"></div><span class="team-name">정다운</span><span class="team-part">BE</span></div>
+              <div class="team-item"><div class="team-dot vacation"></div><span class="team-name">한지민</span><span class="team-part">QA</span></div>
+              <div class="team-item"><div class="team-dot working"></div><span class="team-name">박철수</span><span class="team-part">FE</span></div>
+              <div class="team-item"><div class="team-dot working"></div><span class="team-name">최지은</span><span class="team-part">PM</span></div>
+              <div class="team-item"><div class="team-dot vacation"></div><span class="team-name">강서준</span><span class="team-part">BE</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

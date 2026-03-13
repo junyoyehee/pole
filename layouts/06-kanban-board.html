@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 업무 보드</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg-active); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); position: fixed; top: 0; left: 0; bottom: 0; }
+    .sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; height: 56px; }
+    .sidebar-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 0 16px var(--accent-glow); }
+    .sidebar-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .main { flex: 1; margin-left: 240px; display: flex; flex-direction: column; }
+    .header { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: relative; }
+    .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-glow), transparent); }
+    .breadcrumb { font-size: 13px; color: var(--text-tertiary); }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+    .content { padding: 20px; flex: 1; overflow: hidden; }
+
+    .btn { padding: 8px 14px; border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; height: 38px; font-family: var(--font-sans); transition: var(--transition); }
+    .btn-light { background: var(--bg-elevated); border: 1px solid var(--border-medium); color: var(--text-secondary); }
+    .btn-light:hover { background: var(--bg-hover); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #7C3AED); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+
+    /* Project Header */
+    .project-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .project-info { display: flex; align-items: center; gap: 12px; }
+    .project-name { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+    .project-badge { background: var(--green-dim); color: var(--green); }
+    .project-meta { font-size: 12px; color: var(--text-secondary); }
+    .header-controls { display: flex; gap: 6px; align-items: center; }
+    .view-toggle { display: flex; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); overflow: hidden; }
+    .view-btn { padding: 6px 12px; font-size: 12px; background: var(--bg-elevated); border: none; cursor: pointer; color: var(--text-secondary); font-family: var(--font-sans); transition: var(--transition); }
+    .view-btn:hover { background: var(--bg-hover); }
+    .view-btn.active { background: linear-gradient(135deg, var(--accent), #7C3AED); color: white; }
+    .filter-bar { display: flex; gap: 6px; margin-bottom: 14px; }
+    .filter-select { padding: 6px 10px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); font-size: 12px; background: var(--bg-primary); color: var(--text-secondary); font-family: var(--font-sans); transition: var(--transition); }
+    .filter-select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-dim); outline: none; }
+
+    /* Kanban Board */
+    .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; height: calc(100vh - 220px); }
+    .kanban-column { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); display: flex; flex-direction: column; min-height: 0; }
+    .column-header { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); }
+    .column-title { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .column-count { background: var(--bg-active); color: var(--text-secondary); font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 600; font-family: var(--font-mono); }
+    .column-add { width: 24px; height: 24px; border: none; background: transparent; border-radius: var(--radius-xs); cursor: pointer; font-size: 16px; color: var(--text-tertiary); transition: var(--transition); }
+    .column-add:hover { background: var(--bg-hover); color: var(--text-secondary); }
+    .column-body { flex: 1; padding: 8px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+
+    /* Task Card */
+    .task-card { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px; cursor: grab; transition: var(--transition); position: relative; }
+    .task-card:hover { box-shadow: var(--shadow-md); border-color: var(--border-medium); background: var(--bg-hover); }
+    .task-card.dragging { opacity: 0.5; }
+    .task-labels { display: flex; gap: 4px; margin-bottom: 8px; }
+    .label { font-size: 9px; padding: 2px 6px; border-radius: 99px; font-weight: 600; font-family: var(--font-mono); }
+    .label-frontend { background: var(--blue-dim); color: var(--blue); }
+    .label-backend { background: var(--orange-dim); color: var(--orange); }
+    .label-design { background: var(--pink-dim); color: var(--pink); }
+    .label-bug { background: var(--red-dim); color: var(--red); }
+    .label-feature { background: var(--green-dim); color: var(--green); }
+    .task-title { font-size: 13px; font-weight: 500; line-height: 1.4; margin-bottom: 8px; color: var(--text-primary); }
+    .task-meta { display: flex; align-items: center; justify-content: space-between; }
+    .task-assignees { display: flex; }
+    .task-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--bg-active); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 600; color: var(--text-secondary); border: 2px solid var(--bg-elevated); margin-left: -6px; }
+    .task-avatar:first-child { margin-left: 0; }
+    .task-due { font-size: 10px; color: var(--text-tertiary); display: flex; align-items: center; gap: 3px; font-family: var(--font-mono); }
+    .task-due.urgent { color: var(--red); font-weight: 600; }
+    .task-priority { width: 4px; height: 100%; position: absolute; left: 0; top: 0; border-radius: 8px 0 0 8px; }
+    .priority-bar { width: 3px; position: absolute; left: 0; top: 0; bottom: 0; border-radius: 8px 0 0 8px; }
+    .priority-bar.urgent { background: var(--red); }
+    .priority-bar.high { background: var(--orange); }
+    .priority-bar.normal { background: var(--blue); }
+    .priority-bar.low { background: var(--text-tertiary); }
+    .task-figma { font-size: 10px; color: var(--accent); margin-top: 6px; display: flex; align-items: center; gap: 3px; font-family: var(--font-mono); }
+    .task-comments { font-size: 10px; color: var(--text-tertiary); display: flex; align-items: center; gap: 2px; }
+
+    /* Column colors */
+    .col-todo .column-title { color: var(--text-secondary); }
+    .col-progress .column-title { color: var(--blue); }
+    .col-review .column-title { color: var(--orange); }
+    .col-done .column-title { color: var(--green); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">P</div><span class="sidebar-title">Pole</span></div>
+    </aside>
+    <main class="main">
+      <header class="header">
+        <div class="breadcrumb">프로젝트 / <span class="current">미르M 플랫폼 리뉴얼</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-light">← 프로젝트 목록</button>
+        </div>
+      </header>
+      <div class="content">
+        <div class="project-header">
+          <div class="project-info">
+            <span class="project-name">미르M 플랫폼 리뉴얼</span>
+            <span class="badge project-badge">진행중</span>
+            <span class="project-meta">PM: 최지은 · 마감: 2026.04.30 · 진행률 45%</span>
+          </div>
+          <div class="header-controls">
+            <div class="view-toggle">
+              <button class="view-btn active">보드</button>
+              <button class="view-btn">리스트</button>
+              <button class="view-btn">타임라인</button>
+            </div>
+            <button class="btn btn-primary">+ 업무 추가</button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <select class="filter-select"><option>전체 담당자</option><option>김민수</option><option>일달러</option><option>박영호</option></select>
+          <select class="filter-select"><option>전체 라벨</option><option>Frontend</option><option>Backend</option><option>Design</option><option>Bug</option></select>
+          <select class="filter-select"><option>전체 우선순위</option><option>긴급</option><option>높음</option><option>보통</option><option>낮음</option></select>
+        </div>
+
+        <div class="kanban">
+          <!-- TODO -->
+          <div class="kanban-column col-todo">
+            <div class="column-header">
+              <span class="column-title">TODO <span class="column-count">4</span></span>
+              <button class="column-add">+</button>
+            </div>
+            <div class="column-body">
+              <div class="task-card">
+                <div class="priority-bar urgent"></div>
+                <div class="task-labels"><span class="label label-frontend">Frontend</span></div>
+                <div class="task-title">로그인 폼 유효성 검증 추가</div>
+                <div class="task-meta">
+                  <div class="task-assignees">
+                    <div class="task-avatar">김</div>
+                  </div>
+                  <span class="task-due urgent">D-2</span>
+                </div>
+                <div class="task-figma">F Figma 연결됨</div>
+              </div>
+              <div class="task-card">
+                <div class="priority-bar high"></div>
+                <div class="task-labels"><span class="label label-backend">Backend</span></div>
+                <div class="task-title">사용자 인증 API 리팩토링</div>
+                <div class="task-meta">
+                  <div class="task-assignees">
+                    <div class="task-avatar">박</div>
+                  </div>
+                  <span class="task-due">3.20</span>
+                </div>
+              </div>
+              <div class="task-card">
+                <div class="priority-bar normal"></div>
+                <div class="task-labels"><span class="label label-design">Design</span></div>
+                <div class="task-title">마이페이지 디자인 시안 검토</div>
+                <div class="task-meta">
+                  <div class="task-assignees">
+                    <div class="task-avatar">이</div>
+                    <div class="task-avatar">최</div>
+                  </div>
+                  <span class="task-due">3.22</span>
+                </div>
+              </div>
+              <div class="task-card">
+                <div class="priority-bar low"></div>
+                <div class="task-labels"><span class="label label-feature">Feature</span></div>
+                <div class="task-title">다크모드 테마 변수 정의</div>
+                <div class="task-meta">
+                  <div class="task-assignees">
+                    <div class="task-avatar">일</div>
+                  </div>
+                  <span class="task-due">3.28</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 진행중 -->
+          <div class="kanban-column col-progress">
+            <div class="column-header">
+              <span class="column-title">진행중 <span class="column-count">3</span></span>
+              <button class="column-add">+</button>
+            </div>
+            <div class="column-body">
+              <div class="task-card">
+                <div class="priority-bar urgent"></div>
+                <div class="task-labels"><span class="label label-frontend">Frontend</span></div>
+                <div class="task-title">대시보드 위젯 레이아웃 구현</div>
+                <div class="task-meta">
+                  <div class="task-assignees">
+                    <div class="task-avatar">일</div>
+                    <div class="task-avatar">김</div>
+                  </div>
+                  <span class="task-due urgent">D-1</span>
+                </div>
+                <div class="task-figma">F Figma 연결됨</div>
+              </div>
+              <div class="task-card">
+                <div class="priority-bar high"></div>
+                <div class="task-labels"><span class="label label-backend">Backend</span><span class="label label-bug">Bug</span></div>
+                <div class="task-title">JWT 토큰 만료 시 갱신 로직 수정</div>
+                <div class="task-meta">
+                  <div class="task-assignees">
+                    <div class="task-avatar">박</div>
+                  </div>
+                  <span class="task-due">3.18</span>
+                </div>
+              </div>
+              <div class="task-card">
+                <div class="priority-bar normal"></div>
+                <div class="task-labels"><span class="label label-frontend">Frontend</span></div>
+                <div class="task-title">팀원 프로필 카드 컴포넌트</div>
+                <div class="task-meta">
+                  <div class="task-assignees">
+                    <div class="task-avatar">김</div>
+                  </div>
+                  <span class="task-due">3.25</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 리뷰 -->
+          <div class="kanban-column col-review">
+            <div class="column-header">
+              <span class="column-title">리뷰 <span class="column-count">2</span></span>
+              <button class="column-add">+</button>
+            </div>
+            <div class="column-body">
+              <div class="task-card">
+                <div class="priority-bar high"></div>
+                <div class="task-labels"><span class="label label-frontend">Frontend</span></div>
+                <div class="task-title">Figma 허브 프로젝트 목록 페이지</div>
+                <div class="task-meta">
+                  <div class="task-assignees">
+                    <div class="task-avatar">일</div>
+                  </div>
+                  <div class="task-comments">💬 3</div>
+                </div>
+                <div class="task-figma">F Figma 연결됨</div>
+              </div>
+              <div class="task-card">
+                <div class="priority-bar normal"></div>
+                <div class="task-labels"><span class="label label-backend">Backend</span></div>
+                <div class="task-title">Figma 프록시 API 구현</div>
+                <div class="task-meta">
+                  <div class="task-assignees">
+                    <div class="task-avatar">박</div>
+                    <div class="task-avatar">이</div>
+                  </div>
+                  <div class="task-comments">💬 5</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 완료 -->
+          <div class="kanban-column col-done">
+            <div class="column-header">
+              <span class="column-title">완료 <span class="column-count">5</span></span>
+            </div>
+            <div class="column-body">
+              <div class="task-card" style="opacity:0.7">
+                <div class="priority-bar normal"></div>
+                <div class="task-labels"><span class="label label-frontend">Frontend</span></div>
+                <div class="task-title" style="text-decoration:line-through">프로젝트 초기 셋업 (Next.js + Mantine)</div>
+                <div class="task-meta">
+                  <div class="task-assignees"><div class="task-avatar">일</div></div>
+                  <span class="task-due" style="color:var(--green)">완료</span>
+                </div>
+              </div>
+              <div class="task-card" style="opacity:0.7">
+                <div class="priority-bar high"></div>
+                <div class="task-labels"><span class="label label-design">Design</span></div>
+                <div class="task-title" style="text-decoration:line-through">로그인 화면 디자인 확정</div>
+                <div class="task-meta">
+                  <div class="task-assignees"><div class="task-avatar">최</div></div>
+                  <span class="task-due" style="color:var(--green)">완료</span>
+                </div>
+              </div>
+              <div class="task-card" style="opacity:0.7">
+                <div class="priority-bar normal"></div>
+                <div class="task-labels"><span class="label label-backend">Backend</span></div>
+                <div class="task-title" style="text-decoration:line-through">DB 스키마 설계 및 마이그레이션</div>
+                <div class="task-meta">
+                  <div class="task-assignees"><div class="task-avatar">박</div></div>
+                  <span class="task-due" style="color:var(--green)">완료</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

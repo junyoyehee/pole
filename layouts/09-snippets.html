@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 코드 스니펫</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); position: fixed; top: 0; left: 0; bottom: 0; }
+    .sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; height: 56px; }
+    .sidebar-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 0 16px var(--accent-glow); }
+    .sidebar-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .main { flex: 1; margin-left: 240px; }
+    .header { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: relative; }
+    .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-glow), transparent); }
+    .breadcrumb { font-size: 13px; color: var(--text-tertiary); }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+    .content { padding: 20px; }
+
+    .btn { padding: 8px 14px; border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); font-family: var(--font-sans); }
+    .btn-light { background: var(--bg-elevated); border: 1px solid var(--border-medium); color: var(--text-secondary); }
+    .btn-light:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #7C3AED); color: #fff; height: 38px; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 18px var(--accent-glow); }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .page-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+
+    /* Search & Filter */
+    .toolbar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+    .search-input { flex: 1; max-width: 360px; padding: 8px 12px; border: 1px solid var(--border-medium); border-radius: var(--radius-md); font-size: 13px; outline: none; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); transition: var(--transition); }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .filter-select { padding: 8px 10px; border: 1px solid var(--border-medium); border-radius: var(--radius-md); font-size: 12px; background: var(--bg-elevated); color: var(--text-secondary); font-family: var(--font-sans); outline: none; transition: var(--transition); }
+    .filter-select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .tag-filters { display: flex; gap: 4px; flex-wrap: wrap; }
+    .tag-chip { padding: 4px 10px; border-radius: 99px; font-size: 11px; border: 1px solid var(--border-subtle); background: transparent; cursor: pointer; color: var(--text-secondary); transition: var(--transition); }
+    .tag-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .tag-chip.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+
+    /* Snippet Grid */
+    .snippet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+    .snippet-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; transition: box-shadow var(--transition), border-color var(--transition); }
+    .snippet-card:hover { box-shadow: var(--shadow-md); border-color: var(--border-medium); }
+    .snippet-header { padding: 14px 16px 10px; }
+    .snippet-title-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+    .snippet-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .snippet-lang { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 600; font-family: var(--font-mono); }
+    .lang-ts { background: var(--blue-dim); color: var(--blue); }
+    .lang-css { background: var(--pink-dim); color: var(--pink); }
+    .lang-sql { background: var(--yellow-dim); color: var(--yellow); }
+    .lang-shell { background: var(--green-dim); color: var(--green); }
+    .lang-react { background: var(--blue-dim); color: var(--blue); }
+    .snippet-desc { font-size: 12px; color: var(--text-tertiary); line-height: 1.5; }
+    .snippet-tags { display: flex; gap: 4px; margin-top: 8px; }
+    .snippet-tag { font-size: 10px; padding: 2px 6px; border-radius: 99px; background: var(--bg-elevated); color: var(--text-tertiary); }
+
+    /* Code Block */
+    .snippet-code { background: var(--bg-primary); padding: 14px 16px; max-height: 200px; overflow: auto; position: relative; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); }
+    .snippet-code pre { font-family: var(--font-mono); font-size: 12px; line-height: 1.6; color: var(--text-primary); white-space: pre; }
+    .copy-btn { position: absolute; top: 8px; right: 8px; padding: 4px 10px; background: var(--bg-elevated); border: 1px solid var(--border-medium); border-radius: var(--radius-xs); color: var(--text-tertiary); font-size: 11px; cursor: pointer; transition: var(--transition); font-family: var(--font-sans); }
+    .copy-btn:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+    /* Footer */
+    .snippet-footer { padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-subtle); }
+    .snippet-author { display: flex; align-items: center; gap: 6px; }
+    .snippet-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: var(--text-secondary); }
+    .snippet-author-name { font-size: 11px; color: var(--text-tertiary); }
+    .snippet-actions { display: flex; align-items: center; gap: 8px; }
+    .like-btn { border: none; background: none; cursor: pointer; font-size: 12px; color: var(--text-tertiary); display: flex; align-items: center; gap: 3px; transition: var(--transition); }
+    .like-btn:hover { color: var(--red); }
+    .like-btn.liked { color: var(--red); }
+    .snippet-date { font-size: 10px; color: var(--text-muted); }
+    .figma-link { font-size: 10px; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 3px; transition: var(--transition); }
+    .figma-link:hover { color: var(--accent-bright); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">P</div><span class="sidebar-title">Pole</span></div>
+    </aside>
+    <main class="main">
+      <header class="header">
+        <div class="breadcrumb">개발 도구 / <span class="current">코드 스니펫</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-primary">+ 스니펫 등록</button>
+        </div>
+      </header>
+      <div class="content">
+        <div class="page-header">
+          <div>
+            <div class="page-title">코드 스니펫</div>
+            <div style="font-size:12px;color:var(--text-tertiary);margin-top:2px">팀에서 공유하는 유용한 코드 조각들</div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input class="search-input" placeholder="스니펫 검색...">
+          <select class="filter-select"><option>전체 언어</option><option>TypeScript</option><option>CSS</option><option>SQL</option><option>Shell</option></select>
+          <div class="tag-filters">
+            <span class="tag-chip active">전체</span>
+            <span class="tag-chip">react</span>
+            <span class="tag-chip">hook</span>
+            <span class="tag-chip">api</span>
+            <span class="tag-chip">util</span>
+            <span class="tag-chip">css</span>
+          </div>
+        </div>
+
+        <div class="snippet-grid">
+          <!-- Snippet 1 -->
+          <div class="snippet-card">
+            <div class="snippet-header">
+              <div class="snippet-title-row">
+                <span class="snippet-title">useDebounce Hook</span>
+                <span class="snippet-lang lang-ts">TypeScript</span>
+              </div>
+              <div class="snippet-desc">입력값 디바운싱을 위한 커스텀 훅. 검색 필드 등에서 API 호출 최적화에 사용</div>
+              <div class="snippet-tags">
+                <span class="snippet-tag">react</span>
+                <span class="snippet-tag">hook</span>
+                <span class="snippet-tag">util</span>
+              </div>
+            </div>
+            <div class="snippet-code">
+              <button class="copy-btn">복사</button>
+              <pre>import { useState, useEffect } from 'react'
+
+export function useDebounce&lt;T&gt;(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState&lt;T&gt;(value)
+
+  useEffect(() =&gt; {
+    const handler = setTimeout(() =&gt; {
+      setDebouncedValue(value)
+    }, delay)
+    return () =&gt; clearTimeout(handler)
+  }, [value, delay])
+
+  return debouncedValue
+}</pre>
+            </div>
+            <div class="snippet-footer">
+              <div class="snippet-author">
+                <div class="snippet-avatar">일</div>
+                <span class="snippet-author-name">일달러 · 3일 전</span>
+              </div>
+              <div class="snippet-actions">
+                <button class="like-btn liked">♥ 8</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Snippet 2 -->
+          <div class="snippet-card">
+            <div class="snippet-header">
+              <div class="snippet-title-row">
+                <span class="snippet-title">Figma API 이미지 가져오기</span>
+                <span class="snippet-lang lang-ts">TypeScript</span>
+              </div>
+              <div class="snippet-desc">Figma REST API를 통해 특정 노드의 PNG 렌더링을 가져오는 유틸리티 함수</div>
+              <div class="snippet-tags">
+                <span class="snippet-tag">api</span>
+                <span class="snippet-tag">figma</span>
+              </div>
+            </div>
+            <div class="snippet-code">
+              <button class="copy-btn">복사</button>
+              <pre>export async function getFigmaImage(
+  fileKey: string,
+  nodeId: string
+): Promise&lt;string&gt; {
+  const res = await fetch(
+    `/api/figma/images?fileKey=${fileKey}&nodeId=${nodeId}`
+  )
+  const { data } = await res.json()
+  return data.imageUrl
+}</pre>
+            </div>
+            <div class="snippet-footer">
+              <div class="snippet-author">
+                <div class="snippet-avatar">김</div>
+                <span class="snippet-author-name">김민수 · 1주 전</span>
+              </div>
+              <div class="snippet-actions">
+                <a class="figma-link">F Figma 연결</a>
+                <button class="like-btn">♡ 5</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Snippet 3 -->
+          <div class="snippet-card">
+            <div class="snippet-header">
+              <div class="snippet-title-row">
+                <span class="snippet-title">반응형 그리드 믹스인</span>
+                <span class="snippet-lang lang-css">CSS</span>
+              </div>
+              <div class="snippet-desc">Tailwind 없이 사용할 수 있는 반응형 그리드 CSS. 카드 리스트 레이아웃에 유용</div>
+              <div class="snippet-tags">
+                <span class="snippet-tag">css</span>
+                <span class="snippet-tag">layout</span>
+              </div>
+            </div>
+            <div class="snippet-code">
+              <button class="copy-btn">복사</button>
+              <pre>.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill, minmax(280px, 1fr)
+  );
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+}</pre>
+            </div>
+            <div class="snippet-footer">
+              <div class="snippet-author">
+                <div class="snippet-avatar">이</div>
+                <span class="snippet-author-name">이수진 · 2주 전</span>
+              </div>
+              <div class="snippet-actions">
+                <button class="like-btn">♡ 3</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Snippet 4 -->
+          <div class="snippet-card">
+            <div class="snippet-header">
+              <div class="snippet-title-row">
+                <span class="snippet-title">DB 마이그레이션 생성</span>
+                <span class="snippet-lang lang-shell">Shell</span>
+              </div>
+              <div class="snippet-desc">Prisma 마이그레이션 생성 및 적용 스크립트. 환경별 DB URL 자동 설정 포함</div>
+              <div class="snippet-tags">
+                <span class="snippet-tag">db</span>
+                <span class="snippet-tag">prisma</span>
+                <span class="snippet-tag">devops</span>
+              </div>
+            </div>
+            <div class="snippet-code">
+              <button class="copy-btn">복사</button>
+              <pre>#!/bin/bash
+ENV=${1:-dev}
+NAME=${2:-migration}
+
+case $ENV in
+  dev)  URL=$DEV_DATABASE_URL ;;
+  stg)  URL=$STG_DATABASE_URL ;;
+  prod) URL=$PROD_DATABASE_URL ;;
+esac
+
+DATABASE_URL=$URL npx prisma migrate dev \
+  --name "$NAME" \
+  --create-only</pre>
+            </div>
+            <div class="snippet-footer">
+              <div class="snippet-author">
+                <div class="snippet-avatar">박</div>
+                <span class="snippet-author-name">박영호 · 2주 전</span>
+              </div>
+              <div class="snippet-actions">
+                <button class="like-btn liked">♥ 12</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

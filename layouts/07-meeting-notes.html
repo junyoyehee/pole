@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 회의록</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); position: fixed; top: 0; left: 0; bottom: 0; }
+    .sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; height: 56px; }
+    .sidebar-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 0 16px var(--accent-glow); }
+    .sidebar-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .main { flex: 1; margin-left: 240px; }
+    .header { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: relative; }
+    .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-glow), transparent); }
+    .breadcrumb { font-size: 13px; color: var(--text-tertiary); }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+    .content { padding: 20px; }
+
+    .btn { padding: 8px 14px; border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); font-family: var(--font-sans); }
+    .btn-light { background: var(--bg-elevated); border: 1px solid var(--border-medium); color: var(--text-secondary); }
+    .btn-light:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #7C3AED); color: #fff; height: 38px; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 18px var(--accent-glow); }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .page-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+
+    /* Meeting Layout */
+    .meeting-layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; height: calc(100vh - 140px); }
+
+    /* Meeting List */
+    .meeting-list-panel { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+    .list-header { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); }
+    .list-filter { display: flex; gap: 4px; margin-top: 8px; }
+    .filter-chip { padding: 4px 10px; border-radius: 99px; font-size: 11px; border: 1px solid var(--border-subtle); background: transparent; cursor: pointer; color: var(--text-secondary); transition: var(--transition); }
+    .filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-chip.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+    .list-search { width: 100%; padding: 8px 10px; border: 1px solid var(--border-medium); border-radius: var(--radius-md); font-size: 12px; margin-top: 8px; outline: none; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); transition: var(--transition); }
+    .list-search::placeholder { color: var(--text-muted); }
+    .list-search:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .list-body { flex: 1; overflow-y: auto; }
+    .meeting-item { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); cursor: pointer; transition: background var(--transition); }
+    .meeting-item:hover { background: var(--bg-hover); }
+    .meeting-item.active { background: var(--accent-dim); border-left: 3px solid var(--accent); }
+    .meeting-date { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; }
+    .meeting-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
+    .meeting-type { font-size: 10px; padding: 2px 6px; border-radius: 99px; font-family: var(--font-mono); }
+    .type-regular { background: var(--blue-dim); color: var(--blue); }
+    .type-sprint { background: var(--green-dim); color: var(--green); }
+    .type-planning { background: var(--pink-dim); color: var(--pink); }
+    .type-retro { background: var(--orange-dim); color: var(--orange); }
+    .meeting-attendees { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+    /* Meeting Detail */
+    .meeting-detail { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+    .detail-header { padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .detail-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary); }
+    .detail-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-tertiary); flex-wrap: wrap; }
+    .detail-meta .badge { margin-left: 0; }
+    .detail-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+    /* Content Sections */
+    .section { margin-bottom: 24px; }
+    .section-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; color: var(--text-primary); }
+    .section-title::before { content: ''; width: 3px; height: 14px; border-radius: 2px; background: var(--accent); }
+    .section-content { font-size: 13px; color: var(--text-secondary); line-height: 1.8; padding-left: 12px; }
+    .section-content li { margin-bottom: 4px; }
+
+    /* Decisions */
+    .decision-box { background: var(--yellow-dim); border: 1px solid rgba(250,204,21,0.2); border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 8px; }
+    .decision-box p { font-size: 13px; line-height: 1.6; color: var(--text-primary); }
+    .decision-label { font-size: 11px; font-weight: 600; color: var(--yellow); margin-bottom: 4px; font-family: var(--font-mono); }
+
+    /* Action Items */
+    .action-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: var(--bg-tertiary); border-radius: var(--radius-md); margin-bottom: 6px; }
+    .action-check { width: 18px; height: 18px; border: 2px solid var(--border-medium); border-radius: var(--radius-xs); flex-shrink: 0; margin-top: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .action-check.done { background: var(--accent); border-color: var(--accent); color: #fff; font-size: 10px; }
+    .action-info { flex: 1; }
+    .action-title { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .action-title.done { text-decoration: line-through; color: var(--text-tertiary); }
+    .action-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; display: flex; gap: 8px; }
+    .action-convert { padding: 3px 8px; border: 1px solid var(--border-medium); border-radius: var(--radius-xs); font-size: 10px; background: var(--bg-elevated); cursor: pointer; color: var(--accent); white-space: nowrap; transition: var(--transition); font-family: var(--font-sans); }
+    .action-convert:hover { background: var(--accent-dim); border-color: var(--accent); }
+
+    /* Attendees */
+    .attendee-list { display: flex; gap: 8px; flex-wrap: wrap; }
+    .attendee { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; background: var(--bg-elevated); border-radius: 99px; }
+    .attendee-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: var(--text-secondary); }
+    .attendee-name { font-size: 12px; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">P</div><span class="sidebar-title">Pole</span></div>
+    </aside>
+    <main class="main">
+      <header class="header">
+        <div class="breadcrumb">커뮤니케이션 / <span class="current">회의록</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-primary">+ 회의록 작성</button>
+        </div>
+      </header>
+      <div class="content">
+        <div class="meeting-layout">
+          <!-- List -->
+          <div class="meeting-list-panel">
+            <div class="list-header">
+              <div style="font-size:14px;font-weight:600;color:var(--text-primary)">회의록 목록</div>
+              <div class="list-filter">
+                <span class="filter-chip active">전체</span>
+                <span class="filter-chip">정기</span>
+                <span class="filter-chip">스프린트</span>
+                <span class="filter-chip">기획</span>
+                <span class="filter-chip">회고</span>
+              </div>
+              <input class="list-search" placeholder="회의록 검색...">
+            </div>
+            <div class="list-body">
+              <div class="meeting-item active">
+                <div class="meeting-date">2026.03.13 (목) 10:00</div>
+                <div class="meeting-title">주간 스프린트 회의 #12</div>
+                <span class="meeting-type type-sprint">스프린트</span>
+                <div class="meeting-attendees">참석: 최지은, 일달러, 김민수 외 4명</div>
+              </div>
+              <div class="meeting-item">
+                <div class="meeting-date">2026.03.11 (화) 14:00</div>
+                <div class="meeting-title">미르M 디자인 리뷰 미팅</div>
+                <span class="meeting-type type-planning">기획</span>
+                <div class="meeting-attendees">참석: 김디자, 일달러, 최지은</div>
+              </div>
+              <div class="meeting-item">
+                <div class="meeting-date">2026.03.06 (목) 10:00</div>
+                <div class="meeting-title">주간 스프린트 회의 #11</div>
+                <span class="meeting-type type-sprint">스프린트</span>
+                <div class="meeting-attendees">참석: 최지은, 일달러, 김민수 외 5명</div>
+              </div>
+              <div class="meeting-item">
+                <div class="meeting-date">2026.03.03 (월) 16:00</div>
+                <div class="meeting-title">2월 스프린트 회고</div>
+                <span class="meeting-type type-retro">회고</span>
+                <div class="meeting-attendees">참석: 전체 팀원</div>
+              </div>
+              <div class="meeting-item">
+                <div class="meeting-date">2026.02.27 (목) 10:00</div>
+                <div class="meeting-title">주간 스프린트 회의 #10</div>
+                <span class="meeting-type type-sprint">스프린트</span>
+                <div class="meeting-attendees">참석: 최지은, 일달러 외 6명</div>
+              </div>
+              <div class="meeting-item">
+                <div class="meeting-date">2026.02.24 (월) 11:00</div>
+                <div class="meeting-title">Q1 기술 로드맵 회의</div>
+                <span class="meeting-type type-regular">정기</span>
+                <div class="meeting-attendees">참석: 전체 팀원</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail -->
+          <div class="meeting-detail">
+            <div class="detail-header">
+              <div class="detail-title">주간 스프린트 회의 #12</div>
+              <div class="detail-meta">
+                <span class="badge type-sprint">스프린트</span>
+                <span>2026.03.13 (목) 10:00 ~ 11:00</span>
+                <span>작성: 최지은</span>
+              </div>
+              <div style="margin-top:10px">
+                <div class="attendee-list">
+                  <div class="attendee"><div class="attendee-avatar">최</div><span class="attendee-name">최지은</span></div>
+                  <div class="attendee"><div class="attendee-avatar">일</div><span class="attendee-name">일달러</span></div>
+                  <div class="attendee"><div class="attendee-avatar">김</div><span class="attendee-name">김민수</span></div>
+                  <div class="attendee"><div class="attendee-avatar">박</div><span class="attendee-name">박영호</span></div>
+                  <div class="attendee"><div class="attendee-avatar">이</div><span class="attendee-name">이수진</span></div>
+                  <div class="attendee"><div class="attendee-avatar">디</div><span class="attendee-name">김디자</span></div>
+                  <div class="attendee"><div class="attendee-avatar">한</div><span class="attendee-name">한소영</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="detail-body">
+              <div class="section">
+                <div class="section-title">안건</div>
+                <div class="section-content">
+                  <ul>
+                    <li>지난주 업무 진행 상황 공유</li>
+                    <li>미르M 로그인 화면 디자인 리뷰 결과</li>
+                    <li>이번주 업무 계획 및 우선순위 조정</li>
+                    <li>배포 일정 확인</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-title">회의 내용</div>
+                <div class="section-content">
+                  <p><strong>1. 업무 진행 상황</strong></p>
+                  <ul>
+                    <li>대시보드 위젯 레이아웃: 80% 완료, 차트 라이브러리 연동 남음 (일달러)</li>
+                    <li>JWT 토큰 갱신 로직: refresh token rotation 적용 완료, 테스트 중 (박영호)</li>
+                    <li>Figma 허브 목록 페이지: 코드 리뷰 요청 올림 (일달러)</li>
+                    <li>로그인 화면 v3 디자인: 피드백 반영 중 (김디자)</li>
+                  </ul>
+                  <br>
+                  <p><strong>2. 디자인 리뷰 결과</strong></p>
+                  <ul>
+                    <li>비밀번호 토글 아이콘 추가 필요 (수정요청)</li>
+                    <li>소셜 로그인 버튼 높이 통일 (의견)</li>
+                    <li>에러 메시지 색상 WCAG AA 기준 확인 필요</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-title">결정 사항</div>
+                <div class="decision-box">
+                  <div class="decision-label">결정 1</div>
+                  <p>로그인 화면 v3는 피드백 반영 후 3/14(금)까지 최종 확정한다.</p>
+                </div>
+                <div class="decision-box">
+                  <div class="decision-label">결정 2</div>
+                  <p>Staging 배포는 3/17(월)로 확정, Production은 3/21(금) 예정.</p>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-title">액션 아이템</div>
+                <div class="action-item">
+                  <div class="action-check"></div>
+                  <div class="action-info">
+                    <div class="action-title">로그인 v3 비밀번호 토글 아이콘 추가</div>
+                    <div class="action-meta"><span>담당: 김디자</span><span>기한: 3/14</span></div>
+                  </div>
+                  <button class="action-convert">업무로 변환</button>
+                </div>
+                <div class="action-item">
+                  <div class="action-check"></div>
+                  <div class="action-info">
+                    <div class="action-title">에러 메시지 색상 WCAG AA 검증</div>
+                    <div class="action-meta"><span>담당: 김디자</span><span>기한: 3/14</span></div>
+                  </div>
+                  <button class="action-convert">업무로 변환</button>
+                </div>
+                <div class="action-item">
+                  <div class="action-check done">✓</div>
+                  <div class="action-info">
+                    <div class="action-title done">JWT refresh token rotation 코드 리뷰</div>
+                    <div class="action-meta"><span>담당: 일달러</span><span>기한: 3/12</span></div>
+                  </div>
+                </div>
+                <div class="action-item">
+                  <div class="action-check"></div>
+                  <div class="action-info">
+                    <div class="action-title">Staging 배포 환경 사전 점검</div>
+                    <div class="action-meta"><span>담당: 박영호</span><span>기한: 3/16</span></div>
+                  </div>
+                  <button class="action-convert">업무로 변환</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

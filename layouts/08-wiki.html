@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 팀 위키</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); position: fixed; top: 0; left: 0; bottom: 0; }
+    .sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; height: 56px; }
+    .sidebar-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 0 16px var(--accent-glow); }
+    .sidebar-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .main { flex: 1; margin-left: 240px; }
+    .header { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: relative; }
+    .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-glow), transparent); }
+    .breadcrumb { font-size: 13px; color: var(--text-tertiary); }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+    .content { padding: 20px; }
+
+    .btn { padding: 8px 14px; border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); font-family: var(--font-sans); }
+    .btn-light { background: var(--bg-elevated); border: 1px solid var(--border-medium); color: var(--text-secondary); }
+    .btn-light:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #7C3AED); color: #fff; height: 38px; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 18px var(--accent-glow); }
+
+    /* Wiki Layout */
+    .wiki-layout { display: grid; grid-template-columns: 260px 1fr; gap: 16px; height: calc(100vh - 140px); }
+
+    /* Document Tree */
+    .tree-panel { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+    .tree-header { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .tree-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .tree-add { width: 24px; height: 24px; border: none; background: transparent; border-radius: var(--radius-xs); cursor: pointer; font-size: 16px; color: var(--text-tertiary); transition: var(--transition); }
+    .tree-add:hover { background: var(--bg-hover); color: var(--accent); }
+    .tree-search { padding: 8px 14px; border-bottom: 1px solid var(--border-subtle); }
+    .tree-search input { width: 100%; padding: 7px 10px; border: 1px solid var(--border-medium); border-radius: var(--radius-md); font-size: 12px; outline: none; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); transition: var(--transition); }
+    .tree-search input::placeholder { color: var(--text-muted); }
+    .tree-search input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .tree-body { flex: 1; overflow-y: auto; padding: 8px; }
+
+    .tree-category { margin-bottom: 4px; }
+    .tree-cat-header { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-secondary); transition: var(--transition); }
+    .tree-cat-header:hover { background: var(--bg-hover); }
+    .tree-arrow { font-size: 10px; color: var(--text-muted); width: 12px; }
+    .tree-cat-icon { font-size: 13px; }
+    .tree-items { padding-left: 20px; }
+    .tree-item { display: flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; color: var(--text-secondary); transition: var(--transition); }
+    .tree-item:hover { background: var(--bg-hover); }
+    .tree-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 500; }
+    .tree-item-icon { font-size: 11px; color: var(--text-muted); }
+
+    /* Document View */
+    .doc-panel { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+    .doc-header { padding: 16px 24px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: flex-start; justify-content: space-between; }
+    .doc-title { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+    .doc-meta { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; display: flex; gap: 12px; }
+    .doc-actions { display: flex; gap: 6px; }
+    .doc-body { flex: 1; overflow-y: auto; padding: 24px; }
+
+    /* Markdown-like content */
+    .md-content h2 { font-size: 17px; font-weight: 700; margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
+    .md-content h2:first-child { margin-top: 0; }
+    .md-content h3 { font-size: 14px; font-weight: 600; margin: 16px 0 8px; color: var(--text-primary); }
+    .md-content p { font-size: 13px; line-height: 1.8; margin-bottom: 10px; color: var(--text-secondary); }
+    .md-content ul, .md-content ol { font-size: 13px; line-height: 1.8; padding-left: 20px; margin-bottom: 10px; color: var(--text-secondary); }
+    .md-content code { background: var(--bg-elevated); padding: 2px 5px; border-radius: 3px; font-size: 12px; color: var(--accent-bright); font-family: var(--font-mono); }
+    .md-content pre { background: var(--bg-primary); color: var(--text-primary); padding: 14px 16px; border-radius: var(--radius-md); margin-bottom: 12px; overflow-x: auto; border: 1px solid var(--border-subtle); }
+    .md-content pre code { background: transparent; color: var(--text-primary); padding: 0; font-size: 12px; line-height: 1.6; }
+    .md-content table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13px; }
+    .md-content th { background: var(--bg-tertiary); padding: 8px 12px; text-align: left; border: 1px solid var(--border-subtle); font-weight: 600; font-size: 12px; color: var(--text-primary); }
+    .md-content td { padding: 8px 12px; border: 1px solid var(--border-subtle); color: var(--text-secondary); }
+    .md-content .callout { background: var(--blue-dim); border-left: 3px solid var(--blue); padding: 10px 14px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 12px; font-size: 13px; color: var(--text-secondary); }
+
+    /* Version History */
+    .version-bar { padding: 8px 24px; border-top: 1px solid var(--border-subtle); background: var(--bg-tertiary); display: flex; align-items: center; justify-content: space-between; }
+    .version-info { font-size: 11px; color: var(--text-tertiary); }
+    .version-link { font-size: 11px; color: var(--accent); cursor: pointer; text-decoration: none; transition: var(--transition); }
+    .version-link:hover { color: var(--accent-bright); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">P</div><span class="sidebar-title">Pole</span></div>
+    </aside>
+    <main class="main">
+      <header class="header">
+        <div class="breadcrumb">커뮤니케이션 / 위키 / <span class="current">코딩 컨벤션</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-primary">+ 새 문서</button>
+        </div>
+      </header>
+      <div class="content">
+        <div class="wiki-layout">
+          <!-- Tree -->
+          <div class="tree-panel">
+            <div class="tree-header">
+              <span class="tree-title">문서 트리</span>
+              <button class="tree-add" title="카테고리 추가">+</button>
+            </div>
+            <div class="tree-search">
+              <input placeholder="문서 검색...">
+            </div>
+            <div class="tree-body">
+              <div class="tree-category">
+                <div class="tree-cat-header"><span class="tree-arrow">▼</span><span class="tree-cat-icon">📁</span> 온보딩 가이드</div>
+                <div class="tree-items">
+                  <div class="tree-item"><span class="tree-item-icon">📄</span> 신규 입사자 가이드</div>
+                  <div class="tree-item"><span class="tree-item-icon">📄</span> 개발환경 셋업</div>
+                  <div class="tree-item"><span class="tree-item-icon">📄</span> Git 워크플로우</div>
+                </div>
+              </div>
+              <div class="tree-category">
+                <div class="tree-cat-header"><span class="tree-arrow">▼</span><span class="tree-cat-icon">📁</span> 코딩 컨벤션</div>
+                <div class="tree-items">
+                  <div class="tree-item active"><span class="tree-item-icon">📄</span> TypeScript 스타일 가이드</div>
+                  <div class="tree-item"><span class="tree-item-icon">📄</span> React 컴포넌트 패턴</div>
+                  <div class="tree-item"><span class="tree-item-icon">📄</span> CSS/Styling 규칙</div>
+                  <div class="tree-item"><span class="tree-item-icon">📄</span> API 네이밍 규칙</div>
+                </div>
+              </div>
+              <div class="tree-category">
+                <div class="tree-cat-header"><span class="tree-arrow">▶</span><span class="tree-cat-icon">📁</span> 디자인 시스템</div>
+              </div>
+              <div class="tree-category">
+                <div class="tree-cat-header"><span class="tree-arrow">▶</span><span class="tree-cat-icon">📁</span> 인프라 / 배포</div>
+              </div>
+              <div class="tree-category">
+                <div class="tree-cat-header"><span class="tree-arrow">▶</span><span class="tree-cat-icon">📁</span> API 문서</div>
+              </div>
+              <div class="tree-category">
+                <div class="tree-cat-header"><span class="tree-arrow">▶</span><span class="tree-cat-icon">📁</span> 트러블슈팅</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document -->
+          <div class="doc-panel">
+            <div class="doc-header">
+              <div>
+                <div class="doc-title">TypeScript 스타일 가이드</div>
+                <div class="doc-meta">
+                  <span>작성: 일달러</span>
+                  <span>최근 수정: 김민수 · 2026.03.10</span>
+                </div>
+              </div>
+              <div class="doc-actions">
+                <button class="btn btn-light">수정 이력</button>
+                <button class="btn btn-primary">편집</button>
+              </div>
+            </div>
+            <div class="doc-body">
+              <div class="md-content">
+                <div class="callout">이 문서는 팀 전체가 따르는 TypeScript 코딩 컨벤션입니다. PR 리뷰 시 이 가이드를 기준으로 합니다.</div>
+
+                <h2>1. 기본 규칙</h2>
+                <ul>
+                  <li><code>strict</code> 모드 필수 사용</li>
+                  <li><code>any</code> 타입 사용 금지 (불가피한 경우 <code>unknown</code> 사용)</li>
+                  <li>세미콜론 사용하지 않음 (Prettier 설정)</li>
+                  <li>들여쓰기: 2 spaces</li>
+                </ul>
+
+                <h2>2. 네이밍 규칙</h2>
+                <table>
+                  <thead>
+                    <tr><th>대상</th><th>규칙</th><th>예시</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>변수 / 함수</td><td>camelCase</td><td><code>getUserName</code></td></tr>
+                    <tr><td>컴포넌트</td><td>PascalCase</td><td><code>UserProfile</code></td></tr>
+                    <tr><td>타입 / 인터페이스</td><td>PascalCase</td><td><code>UserData</code></td></tr>
+                    <tr><td>상수</td><td>UPPER_SNAKE</td><td><code>MAX_RETRY_COUNT</code></td></tr>
+                    <tr><td>Enum</td><td>PascalCase</td><td><code>UserRole</code></td></tr>
+                    <tr><td>파일 (컴포넌트)</td><td>PascalCase</td><td><code>UserProfile.tsx</code></td></tr>
+                    <tr><td>파일 (유틸)</td><td>camelCase</td><td><code>formatDate.ts</code></td></tr>
+                  </tbody>
+                </table>
+
+                <h2>3. 타입 정의</h2>
+                <h3>Interface vs Type</h3>
+                <p>객체 형태는 <code>interface</code>를 사용하고, 유니온/인터섹션 등은 <code>type</code>을 사용합니다.</p>
+                <pre><code>// Good
+interface User {
+  id: string
+  name: string
+  role: UserRole
+}
+
+type Status = 'active' | 'inactive' | 'pending'
+
+// Bad
+type User = {
+  id: string
+  name: string
+}</code></pre>
+
+                <h2>4. React 컴포넌트</h2>
+                <p>함수 컴포넌트만 사용합니다. Props는 별도 interface로 정의합니다.</p>
+                <pre><code>interface ButtonProps {
+  label: string
+  variant?: 'primary' | 'secondary'
+  onClick: () => void
+}
+
+export function Button({ label, variant = 'primary', onClick }: ButtonProps) {
+  return (
+    &lt;button className={styles[variant]} onClick={onClick}&gt;
+      {label}
+    &lt;/button&gt;
+  )
+}</code></pre>
+              </div>
+            </div>
+            <div class="version-bar">
+              <span class="version-info">v12 · 마지막 수정: 2026.03.10 14:32</span>
+              <a class="version-link">수정 이력 보기 →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

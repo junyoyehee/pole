@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 핸드오프</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--border-medium); border-radius:99px; }
+    ::-webkit-scrollbar-thumb:hover { background:var(--text-tertiary); }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); position: fixed; top: 0; left: 0; bottom: 0; }
+    .sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; height: 56px; }
+    .sidebar-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 0 16px var(--accent-glow); }
+    .sidebar-title { font-size: 16px; font-weight: 700; }
+    .main { flex: 1; margin-left: 240px; }
+    .header { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: relative; }
+    .header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--accent-glow),transparent); }
+    .breadcrumb { font-size: 13px; color: var(--text-tertiary); }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+    .content { padding: 20px; }
+
+    .btn { padding: 8px 14px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); }
+    .btn-light { background: var(--bg-elevated); border: 1px solid var(--border-medium); color: var(--text-secondary); }
+    .btn-light:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #7C3AED); color: white; border: none; border-radius: var(--radius-md); height: 38px; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 18px var(--accent-glow); }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .page-title { font-size: 20px; font-weight: 700; }
+
+    /* Handoff Layout */
+    .handoff-layout { display: grid; grid-template-columns: 1fr 420px; gap: 16px; height: calc(100vh - 160px); }
+
+    /* Handoff List */
+    .handoff-list { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+    .list-header { padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .list-title { font-size: 14px; font-weight: 600; }
+    .list-filters { display: flex; gap: 6px; }
+    .filter-select { padding: 5px 8px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); font-size: 11px; background: var(--bg-primary); color: var(--text-primary); }
+    .list-body { flex: 1; overflow-y: auto; }
+
+    .handoff-item { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); cursor: pointer; transition: background var(--transition); display: flex; gap: 12px; }
+    .handoff-item:hover { background: var(--bg-hover); }
+    .handoff-item.active { background: var(--accent-dim); border-left: 3px solid var(--accent); }
+    .handoff-thumb { width: 56px; height: 56px; border-radius: var(--radius-md); background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; border: 1px solid var(--border-medium); }
+    .handoff-info { flex: 1; min-width: 0; }
+    .handoff-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .handoff-meta { font-size: 11px; color: var(--text-tertiary); display: flex; gap: 8px; align-items: center; }
+
+    .status-badge { padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+    .status-pending { background: var(--gray-badge-dim); color: var(--gray-badge); }
+    .status-progress { background: var(--blue-dim); color: var(--blue); }
+    .status-implemented { background: var(--orange-dim); color: var(--orange); }
+    .status-verified { background: var(--green-dim); color: var(--green); }
+
+    .priority-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .priority-dot.high { background: var(--red); }
+    .priority-dot.normal { background: var(--blue); }
+    .priority-dot.low { background: var(--gray-badge); }
+
+    /* Handoff Detail */
+    .handoff-detail { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+    .detail-header { padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .detail-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .detail-badges { display: flex; gap: 6px; margin-bottom: 8px; }
+    .detail-meta { font-size: 12px; color: var(--text-tertiary); display: flex; gap: 12px; }
+    .detail-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+
+    /* Design Preview */
+    .design-preview { background: var(--bg-primary); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 180px; margin-bottom: 16px; color: var(--text-tertiary); font-size: 14px; border: 1px solid var(--border-medium); }
+
+    /* Spec Table */
+    .spec-section { margin-bottom: 16px; }
+    .spec-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .spec-title::before { content: ''; width: 3px; height: 12px; border-radius: 2px; background: var(--accent); }
+    .spec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .spec-table th { background: var(--bg-tertiary); padding: 7px 10px; text-align: left; font-weight: 600; color: var(--text-tertiary); border: 1px solid var(--border-subtle); }
+    .spec-table td { padding: 7px 10px; border: 1px solid var(--border-subtle); }
+    .spec-color { display: inline-flex; align-items: center; gap: 6px; }
+    .color-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border-medium); }
+
+    /* Notes */
+    .notes-section { margin-bottom: 16px; }
+    .notes-content { font-size: 13px; color: var(--text-secondary); line-height: 1.7; background: var(--bg-primary); padding: 12px 14px; border-radius: var(--radius-md); }
+
+    /* Actions */
+    .detail-actions { padding: 12px 20px; border-top: 1px solid var(--border-subtle); display: flex; gap: 6px; justify-content: flex-end; }
+    .btn-violet { background: linear-gradient(135deg, var(--accent), #7C3AED); color: white; border: none; border-radius: var(--radius-md); height: 38px; }
+    .btn-violet:hover { transform: translateY(-1px); box-shadow: 0 4px 18px var(--accent-glow); }
+    .btn-green { background: linear-gradient(135deg, var(--green), #22C55E); color: #0C0C0F; border: none; border-radius: var(--radius-md); height: 38px; }
+    .btn-green:hover { transform: translateY(-1px); box-shadow: 0 4px 18px var(--green-dim); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">P</div><span class="sidebar-title">Pole</span></div>
+    </aside>
+    <main class="main">
+      <header class="header">
+        <div class="breadcrumb">Figma / 미르M 플랫폼 / <span class="current">핸드오프</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-light">← 프로젝트</button>
+          <button class="btn btn-primary">+ 핸드오프 등록</button>
+        </div>
+      </header>
+      <div class="content">
+        <div class="page-header">
+          <div>
+            <div class="page-title">핸드오프 목록</div>
+            <div style="font-size:12px;color:var(--text-tertiary);margin-top:2px">미르M 플랫폼 · 총 8개 컴포넌트</div>
+          </div>
+        </div>
+
+        <div class="handoff-layout">
+          <!-- List -->
+          <div class="handoff-list">
+            <div class="list-header">
+              <span class="list-title">컴포넌트</span>
+              <div class="list-filters">
+                <select class="filter-select"><option>전체 상태</option><option>대기</option><option>진행중</option><option>구현완료</option><option>검증완료</option></select>
+                <select class="filter-select"><option>전체 우선순위</option><option>높음</option><option>보통</option><option>낮음</option></select>
+              </div>
+            </div>
+            <div class="list-body">
+              <div class="handoff-item active">
+                <div class="handoff-thumb">🔐</div>
+                <div class="handoff-info">
+                  <div class="handoff-name">LoginForm</div>
+                  <div class="handoff-meta">
+                    <span class="status-badge status-progress">진행중</span>
+                    <span class="priority-dot high" title="높음"></span>
+                    <span>담당: 김민수</span>
+                  </div>
+                </div>
+              </div>
+              <div class="handoff-item">
+                <div class="handoff-thumb">📊</div>
+                <div class="handoff-info">
+                  <div class="handoff-name">DashboardWidget</div>
+                  <div class="handoff-meta">
+                    <span class="status-badge status-progress">진행중</span>
+                    <span class="priority-dot high" title="높음"></span>
+                    <span>담당: 일달러</span>
+                  </div>
+                </div>
+              </div>
+              <div class="handoff-item">
+                <div class="handoff-thumb">👤</div>
+                <div class="handoff-info">
+                  <div class="handoff-name">UserProfileCard</div>
+                  <div class="handoff-meta">
+                    <span class="status-badge status-implemented">구현완료</span>
+                    <span class="priority-dot normal" title="보통"></span>
+                    <span>담당: 김민수</span>
+                  </div>
+                </div>
+              </div>
+              <div class="handoff-item">
+                <div class="handoff-thumb">🔔</div>
+                <div class="handoff-info">
+                  <div class="handoff-name">NotificationPanel</div>
+                  <div class="handoff-meta">
+                    <span class="status-badge status-pending">대기</span>
+                    <span class="priority-dot normal" title="보통"></span>
+                    <span>담당: 이수진</span>
+                  </div>
+                </div>
+              </div>
+              <div class="handoff-item">
+                <div class="handoff-thumb">📋</div>
+                <div class="handoff-info">
+                  <div class="handoff-name">TaskCard</div>
+                  <div class="handoff-meta">
+                    <span class="status-badge status-verified">검증완료</span>
+                    <span class="priority-dot normal" title="보통"></span>
+                    <span>담당: 일달러</span>
+                  </div>
+                </div>
+              </div>
+              <div class="handoff-item">
+                <div class="handoff-thumb">🧭</div>
+                <div class="handoff-info">
+                  <div class="handoff-name">SideNavigation</div>
+                  <div class="handoff-meta">
+                    <span class="status-badge status-verified">검증완료</span>
+                    <span class="priority-dot low" title="낮음"></span>
+                    <span>담당: 김민수</span>
+                  </div>
+                </div>
+              </div>
+              <div class="handoff-item">
+                <div class="handoff-thumb">🎨</div>
+                <div class="handoff-info">
+                  <div class="handoff-name">DesignReviewPanel</div>
+                  <div class="handoff-meta">
+                    <span class="status-badge status-pending">대기</span>
+                    <span class="priority-dot high" title="높음"></span>
+                    <span>담당: 미정</span>
+                  </div>
+                </div>
+              </div>
+              <div class="handoff-item">
+                <div class="handoff-thumb">📝</div>
+                <div class="handoff-info">
+                  <div class="handoff-name">MarkdownEditor</div>
+                  <div class="handoff-meta">
+                    <span class="status-badge status-pending">대기</span>
+                    <span class="priority-dot low" title="낮음"></span>
+                    <span>담당: 미정</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail -->
+          <div class="handoff-detail">
+            <div class="detail-header">
+              <div class="detail-title">LoginForm</div>
+              <div class="detail-badges">
+                <span class="status-badge status-progress">진행중</span>
+                <span class="badge" style="background:var(--red-dim);color:var(--red)">높음</span>
+              </div>
+              <div class="detail-meta">
+                <span>담당: 김민수</span>
+                <span>디자이너: 김디자</span>
+              </div>
+            </div>
+            <div class="detail-body">
+              <div class="design-preview">
+                🎨 Figma 디자인 미리보기 (LoginForm)
+              </div>
+
+              <div class="spec-section">
+                <div class="spec-title">디자인 스펙</div>
+                <table class="spec-table">
+                  <tr><th>속성</th><th>값</th></tr>
+                  <tr><td>너비</td><td>400px</td></tr>
+                  <tr><td>패딩</td><td>32px</td></tr>
+                  <tr><td>배경</td><td><span class="spec-color"><span class="color-swatch" style="background:#fff"></span> #FFFFFF</span></td></tr>
+                  <tr><td>보더</td><td>1px solid #E9ECEF, radius 12px</td></tr>
+                  <tr><td>그림자</td><td>0 4px 24px rgba(0,0,0,0.06)</td></tr>
+                </table>
+              </div>
+
+              <div class="spec-section">
+                <div class="spec-title">타이포그래피</div>
+                <table class="spec-table">
+                  <tr><th>요소</th><th>폰트</th><th>크기</th><th>색상</th></tr>
+                  <tr><td>제목</td><td>Segoe UI Bold</td><td>24px</td><td><span class="spec-color"><span class="color-swatch" style="background:#212529"></span> #212529</span></td></tr>
+                  <tr><td>레이블</td><td>Segoe UI Medium</td><td>14px</td><td><span class="spec-color"><span class="color-swatch" style="background:#495057"></span> #495057</span></td></tr>
+                  <tr><td>입력 텍스트</td><td>Segoe UI Regular</td><td>14px</td><td><span class="spec-color"><span class="color-swatch" style="background:#212529"></span> #212529</span></td></tr>
+                  <tr><td>에러 텍스트</td><td>Segoe UI Regular</td><td>12px</td><td><span class="spec-color"><span class="color-swatch" style="background:#e03131"></span> #E03131</span></td></tr>
+                </table>
+              </div>
+
+              <div class="notes-section">
+                <div class="spec-title">참고사항</div>
+                <div class="notes-content">
+                  <p>• 비밀번호 필드에 눈 아이콘(표시/숨기기) 토글 추가 필요</p>
+                  <p>• 소셜 로그인 버튼은 Google, GitHub 2가지</p>
+                  <p>• 에러 메시지 WCAG AA 기준 대비율 확인 완료</p>
+                  <p>• 로딩 상태 시 버튼에 스피너 표시</p>
+                </div>
+              </div>
+            </div>
+            <div class="detail-actions">
+              <button class="btn btn-violet">Figma에서 보기</button>
+              <button class="btn btn-green">구현 완료</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

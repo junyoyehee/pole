@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 게시판</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--border-medium); border-radius:99px; }
+    ::-webkit-scrollbar-thumb:hover { background:var(--text-tertiary); }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); position: fixed; top: 0; left: 0; bottom: 0; }
+    .sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; height: 56px; }
+    .sidebar-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 0 16px var(--accent-glow); }
+    .sidebar-title { font-size: 16px; font-weight: 700; }
+    .main { flex: 1; margin-left: 240px; }
+    .header { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: relative; }
+    .header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--accent-glow),transparent); }
+    .breadcrumb { font-size: 13px; color: var(--text-tertiary); }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+    .content { padding: 20px; max-width: 900px; }
+
+    .btn { padding: 8px 14px; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); }
+    .btn-light { background: var(--bg-elevated); border: 1px solid var(--border-medium); color: var(--text-secondary); }
+    .btn-light:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #7C3AED); color: white; border: none; border-radius: var(--radius-md); height: 38px; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 18px var(--accent-glow); }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .page-title { font-size: 20px; font-weight: 700; }
+
+    /* Tabs */
+    .board-tabs { display: flex; gap: 2px; margin-bottom: 16px; border-bottom: 2px solid var(--border-subtle); }
+    .tab { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text-tertiary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: var(--transition); }
+    .tab:hover { color: var(--text-secondary); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+    .tab .tab-count { font-size: 10px; background: var(--bg-elevated); padding: 1px 5px; border-radius: 8px; margin-left: 4px; }
+
+    /* Search */
+    .board-toolbar { display: flex; gap: 8px; margin-bottom: 14px; }
+    .search-input { flex: 1; max-width: 320px; padding: 8px 12px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); font-size: 13px; outline: none; background: var(--bg-primary); color: var(--text-primary); transition: var(--transition); }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-dim); }
+
+    /* Post List */
+    .post-list { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; }
+    .post-item { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); cursor: pointer; transition: background var(--transition); }
+    .post-item:last-child { border-bottom: none; }
+    .post-item:hover { background: var(--bg-hover); }
+    .post-item.pinned { background: var(--accent-dim); }
+    .post-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .pin-icon { font-size: 12px; }
+    .post-category { font-size: 10px; padding: 2px 6px; border-radius: 99px; font-weight: 600; font-family: var(--font-mono); }
+    .cat-notice { background: var(--red-dim); color: var(--red); }
+    .cat-free { background: var(--blue-dim); color: var(--blue); }
+    .cat-tech { background: var(--green-dim); color: var(--green); }
+    .cat-question { background: var(--orange-dim); color: var(--orange); }
+    .cat-suggestion { background: var(--pink-dim); color: var(--pink); }
+    .post-title { font-size: 14px; font-weight: 600; flex: 1; }
+    .post-comment-count { font-size: 11px; color: var(--accent); font-weight: 600; }
+    .post-body-preview { font-size: 12px; color: var(--text-tertiary); line-height: 1.5; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .post-meta { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-muted); }
+    .post-author { display: flex; align-items: center; gap: 5px; }
+    .post-avatar { width: 18px; height: 18px; border-radius: 50%; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 600; color: var(--text-secondary); }
+
+    /* Pagination */
+    .pagination { display: flex; justify-content: center; gap: 4px; margin-top: 16px; }
+    .page-btn { width: 32px; height: 32px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); background: var(--bg-secondary); font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); transition: var(--transition); }
+    .page-btn:hover { background: var(--bg-hover); }
+    .page-btn.active { background: linear-gradient(135deg, var(--accent), #7C3AED); color: white; border-color: transparent; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">P</div><span class="sidebar-title">Pole</span></div>
+    </aside>
+    <main class="main">
+      <header class="header">
+        <div class="breadcrumb">커뮤니케이션 / <span class="current">게시판</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-primary">+ 글 작성</button>
+        </div>
+      </header>
+      <div class="content">
+        <div class="page-header">
+          <div class="page-title">팀 게시판</div>
+        </div>
+
+        <div class="board-tabs">
+          <span class="tab active">전체</span>
+          <span class="tab">공지사항 <span class="tab-count">3</span></span>
+          <span class="tab">자유</span>
+          <span class="tab">기술 공유 <span class="tab-count">12</span></span>
+          <span class="tab">질문</span>
+          <span class="tab">건의</span>
+        </div>
+
+        <div class="board-toolbar">
+          <input class="search-input" placeholder="제목, 내용 검색...">
+        </div>
+
+        <div class="post-list">
+          <div class="post-item pinned">
+            <div class="post-top">
+              <span class="pin-icon">📌</span>
+              <span class="post-category cat-notice">공지</span>
+              <span class="post-title">3월 배포 일정 및 코드 프리즈 안내</span>
+              <span class="post-comment-count">💬 4</span>
+            </div>
+            <div class="post-body-preview">3/17(월) Staging 배포, 3/21(금) Production 배포 예정입니다. 3/19(수)부터 코드 프리즈에 들어갑니다...</div>
+            <div class="post-meta">
+              <div class="post-author"><div class="post-avatar">최</div> 최지은</div>
+              <span>2026.03.12</span>
+              <span>조회 45</span>
+              <span>♥ 12</span>
+            </div>
+          </div>
+          <div class="post-item pinned">
+            <div class="post-top">
+              <span class="pin-icon">📌</span>
+              <span class="post-category cat-notice">공지</span>
+              <span class="post-title">Figma MCP 서버 연동 가이드</span>
+              <span class="post-comment-count">💬 7</span>
+            </div>
+            <div class="post-body-preview">피그마 MCP 서버를 통해 디자인 데이터를 직접 조회할 수 있습니다. 설정 방법은...</div>
+            <div class="post-meta">
+              <div class="post-author"><div class="post-avatar">일</div> 일달러</div>
+              <span>2026.03.10</span>
+              <span>조회 38</span>
+              <span>♥ 9</span>
+            </div>
+          </div>
+          <div class="post-item">
+            <div class="post-top">
+              <span class="post-category cat-tech">기술 공유</span>
+              <span class="post-title">Next.js 16 App Router에서 서버 컴포넌트 활용 팁</span>
+              <span class="post-comment-count">💬 6</span>
+            </div>
+            <div class="post-body-preview">서버 컴포넌트에서 직접 DB를 조회하면 API 라우트를 거치지 않아 성능이 훨씬 좋습니다...</div>
+            <div class="post-meta">
+              <div class="post-author"><div class="post-avatar">일</div> 일달러</div>
+              <span>2026.03.12</span>
+              <span>조회 28</span>
+              <span>♥ 15</span>
+            </div>
+          </div>
+          <div class="post-item">
+            <div class="post-top">
+              <span class="post-category cat-question">질문</span>
+              <span class="post-title">Mantine UI에서 테마 커스터마이징 어떻게 하시나요?</span>
+              <span class="post-comment-count">💬 3</span>
+            </div>
+            <div class="post-body-preview">기본 색상 팔레트를 프로젝트에 맞게 변경하고 싶은데, createTheme에서 커스텀 컬러를...</div>
+            <div class="post-meta">
+              <div class="post-author"><div class="post-avatar">이</div> 이수진</div>
+              <span>2026.03.11</span>
+              <span>조회 15</span>
+              <span>♥ 2</span>
+            </div>
+          </div>
+          <div class="post-item">
+            <div class="post-top">
+              <span class="post-category cat-free">자유</span>
+              <span class="post-title">금요일 점심 뭐 먹을까요? 🍕</span>
+              <span class="post-comment-count">💬 11</span>
+            </div>
+            <div class="post-body-preview">이번 주 금요일 팀 점심 메뉴 추천 받습니다! 지난번에 갔던 이탈리안 레스토랑도 좋았는데...</div>
+            <div class="post-meta">
+              <div class="post-author"><div class="post-avatar">한</div> 한소영</div>
+              <span>2026.03.11</span>
+              <span>조회 32</span>
+              <span>♥ 8</span>
+            </div>
+          </div>
+          <div class="post-item">
+            <div class="post-top">
+              <span class="post-category cat-tech">기술 공유</span>
+              <span class="post-title">Prisma에서 JSON 타입 필드 효율적으로 다루기</span>
+            </div>
+            <div class="post-body-preview">핸드오프의 spec_data처럼 JSON 타입 필드를 사용할 때 타입 안전성을 확보하는 방법을...</div>
+            <div class="post-meta">
+              <div class="post-author"><div class="post-avatar">박</div> 박영호</div>
+              <span>2026.03.10</span>
+              <span>조회 22</span>
+              <span>♥ 7</span>
+            </div>
+          </div>
+          <div class="post-item">
+            <div class="post-top">
+              <span class="post-category cat-suggestion">건의</span>
+              <span class="post-title">주간 코드 리뷰 시간 조정 건의</span>
+              <span class="post-comment-count">💬 5</span>
+            </div>
+            <div class="post-body-preview">현재 수요일 오후 2시에 진행하는 코드 리뷰를 목요일 오전으로 옮기면 어떨까요? 수요일은...</div>
+            <div class="post-meta">
+              <div class="post-author"><div class="post-avatar">김</div> 김민수</div>
+              <span>2026.03.09</span>
+              <span>조회 19</span>
+              <span>♥ 4</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pagination">
+          <button class="page-btn">←</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">→</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

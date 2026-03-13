@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 디자인 리뷰</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg-active); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); position: fixed; top: 0; left: 0; bottom: 0; }
+    .sidebar-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; height: 56px; }
+    .sidebar-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 0 16px var(--accent-glow); }
+    .sidebar-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .main { flex: 1; margin-left: 240px; }
+    .header { height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; position: relative; }
+    .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-glow), transparent); }
+    .breadcrumb { font-size: 13px; color: var(--text-tertiary); }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+
+    .content { padding: 20px; }
+    .btn { padding: 8px 14px; border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; height: 38px; font-family: var(--font-sans); transition: var(--transition); }
+    .btn-light { background: var(--bg-elevated); border: 1px solid var(--border-medium); color: var(--text-secondary); }
+    .btn-light:hover { background: var(--bg-hover); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #7C3AED); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-green { background: var(--green); color: #0C0C0F; font-weight: 600; }
+    .btn-green:hover { opacity: 0.9; }
+    .btn-orange { background: var(--orange); color: #0C0C0F; font-weight: 600; }
+    .btn-orange:hover { opacity: 0.9; }
+
+    /* Review Layout */
+    .review-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .review-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary); }
+    .review-meta { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 12px; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: var(--font-mono); }
+    .badge-open { background: var(--orange-dim); color: var(--orange); }
+    .badge-cat { background: var(--gray-badge-dim); color: var(--gray-badge); }
+
+    .review-layout { display: grid; grid-template-columns: 1fr 380px; gap: 16px; height: calc(100vh - 160px); }
+
+    /* Design Preview */
+    .preview-panel { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; }
+    .preview-header { padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .preview-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .preview-actions { display: flex; gap: 4px; }
+    .preview-btn { width: 30px; height: 30px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); background: var(--bg-elevated); cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); transition: var(--transition); }
+    .preview-btn:hover { background: var(--bg-hover); }
+    .preview-body { flex: 1; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; overflow: auto; padding: 20px; }
+    .preview-image { max-width: 100%; background: var(--bg-elevated); border-radius: 8px; box-shadow: var(--shadow-md); padding: 24px; min-height: 400px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-size: 16px; }
+
+    /* Feedback Panel */
+    .feedback-panel { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; }
+    .feedback-header { padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .feedback-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .feedback-count { font-size: 11px; color: var(--accent); font-weight: 600; font-family: var(--font-mono); }
+    .feedback-list { flex: 1; overflow-y: auto; }
+    .feedback-item { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); transition: var(--transition); }
+    .feedback-item:hover { background: var(--bg-hover); }
+    .feedback-author { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .fb-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--text-secondary); }
+    .fb-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .fb-time { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+    .fb-type { margin-left: 6px; }
+    .fb-type.comment { background: var(--blue-dim); color: var(--blue); }
+    .fb-type.change { background: var(--orange-dim); color: var(--orange); }
+    .fb-type.approve { background: var(--green-dim); color: var(--green); }
+    .feedback-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; padding-left: 36px; }
+    .fb-tags { padding-left: 36px; margin-top: 6px; display: flex; gap: 4px; }
+    .fb-tag { font-size: 10px; padding: 2px 6px; border-radius: 99px; background: var(--gray-badge-dim); color: var(--text-tertiary); font-family: var(--font-mono); }
+    .fb-tag.high { background: var(--red-dim); color: var(--red); }
+
+    /* Write Feedback */
+    .feedback-write { padding: 12px 16px; border-top: 1px solid var(--border-subtle); background: var(--bg-tertiary); }
+    .fb-write-row { display: flex; gap: 6px; margin-bottom: 8px; }
+    .fb-select { padding: 5px 8px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); font-size: 12px; background: var(--bg-primary); color: var(--text-secondary); font-family: var(--font-sans); }
+    .fb-select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-dim); outline: none; }
+    .fb-textarea { width: 100%; padding: 10px; border: 1px solid var(--border-medium); border-radius: 8px; font-size: 13px; resize: none; height: 70px; outline: none; font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); transition: var(--transition); }
+    .fb-textarea::placeholder { color: var(--text-muted); }
+    .fb-textarea:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .fb-submit { display: flex; justify-content: flex-end; gap: 6px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">P</div><span class="sidebar-title">Pole</span></div>
+    </aside>
+    <main class="main">
+      <header class="header">
+        <div class="breadcrumb">Figma / 디자인 리뷰 / <span class="current">로그인 화면 v3</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-light">← 목록</button>
+        </div>
+      </header>
+      <div class="content">
+        <div class="review-header">
+          <div>
+            <div class="review-title">로그인 화면 v3 리뷰</div>
+            <div class="review-meta">
+              <span class="badge badge-open">리뷰중</span>
+              <span>요청: 김디자</span>
+              <span>마감: 2026.03.15</span>
+              <span>리뷰어: 일달러, 김민수, 최지은</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-orange">수정 요청</button>
+            <button class="btn btn-green">✓ 승인</button>
+          </div>
+        </div>
+
+        <div class="review-layout">
+          <!-- Preview -->
+          <div class="preview-panel">
+            <div class="preview-header">
+              <span class="preview-title">Figma 디자인 미리보기</span>
+              <div class="preview-actions">
+                <button class="preview-btn" title="확대">+</button>
+                <button class="preview-btn" title="축소">−</button>
+                <button class="preview-btn" title="Figma에서 열기">↗</button>
+              </div>
+            </div>
+            <div class="preview-body">
+              <div class="preview-image">🎨 로그인 화면 디자인 미리보기 (Figma API 렌더링)</div>
+            </div>
+          </div>
+
+          <!-- Feedback -->
+          <div class="feedback-panel">
+            <div class="feedback-header">
+              <span class="feedback-title">피드백</span>
+              <span class="feedback-count">4개</span>
+            </div>
+            <div class="feedback-list">
+              <div class="feedback-item">
+                <div class="feedback-author">
+                  <div class="fb-avatar">일</div>
+                  <span class="fb-name">일달러</span>
+                  <span class="badge fb-type change">수정요청</span>
+                  <span class="fb-time">1시간 전</span>
+                </div>
+                <div class="feedback-body">비밀번호 입력 필드에 눈 아이콘 토글이 빠져 있습니다. 이전 버전에서는 있었는데 v3에서 누락된 것 같아요.</div>
+                <div class="fb-tags">
+                  <span class="fb-tag">UI</span>
+                  <span class="fb-tag high">높음</span>
+                </div>
+              </div>
+              <div class="feedback-item">
+                <div class="feedback-author">
+                  <div class="fb-avatar">김</div>
+                  <span class="fb-name">김민수</span>
+                  <span class="badge fb-type comment">의견</span>
+                  <span class="fb-time">2시간 전</span>
+                </div>
+                <div class="feedback-body">소셜 로그인 버튼 크기가 메인 로그인 버튼보다 시각적으로 크게 보입니다. 높이를 동일하게 맞추면 어떨까요?</div>
+                <div class="fb-tags">
+                  <span class="fb-tag">UX</span>
+                  <span class="fb-tag">보통</span>
+                </div>
+              </div>
+              <div class="feedback-item">
+                <div class="feedback-author">
+                  <div class="fb-avatar">최</div>
+                  <span class="fb-name">최지은</span>
+                  <span class="badge fb-type approve">승인</span>
+                  <span class="fb-time">3시간 전</span>
+                </div>
+                <div class="feedback-body">전체적인 레이아웃과 컬러 톤 좋습니다. PM 관점에서 승인합니다.</div>
+                <div class="fb-tags">
+                  <span class="fb-tag">기타</span>
+                </div>
+              </div>
+              <div class="feedback-item">
+                <div class="feedback-author">
+                  <div class="fb-avatar">일</div>
+                  <span class="fb-name">일달러</span>
+                  <span class="badge fb-type comment">의견</span>
+                  <span class="fb-time">3시간 전</span>
+                </div>
+                <div class="feedback-body">에러 메시지 색상이 배경과 대비가 약합니다. WCAG AA 기준으로 확인 부탁드려요.</div>
+                <div class="fb-tags">
+                  <span class="fb-tag">접근성</span>
+                  <span class="fb-tag">보통</span>
+                </div>
+              </div>
+            </div>
+            <div class="feedback-write">
+              <div class="fb-write-row">
+                <select class="fb-select"><option>의견</option><option>수정요청</option><option>승인</option></select>
+                <select class="fb-select"><option>UI</option><option>UX</option><option>접근성</option><option>기술적</option><option>기타</option></select>
+                <select class="fb-select"><option>보통</option><option>높음</option><option>낮음</option></select>
+              </div>
+              <textarea class="fb-textarea" placeholder="피드백을 입력하세요..."></textarea>
+              <div class="fb-submit">
+                <button class="btn btn-primary" style="padding:6px 14px;font-size:12px">피드백 등록</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

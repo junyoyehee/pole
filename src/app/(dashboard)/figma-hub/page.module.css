@@ -1,0 +1,361 @@
+.content {
+  padding: 16px;
+}
+
+/* Recent Explores */
+.recentSection {
+  margin-bottom: 18px;
+}
+
+.recentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.recentTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary, #8B8FA3);
+}
+
+.recentClear {
+  background: none;
+  border: none;
+  font-size: 9px;
+  color: var(--text-muted, #6B7080);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.recentClear:hover {
+  color: var(--accent, #A78BFA);
+  background: rgba(167, 139, 250, 0.1);
+}
+
+.recentList {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.recentCard {
+  flex-shrink: 0;
+  width: 160px;
+  padding: 10px;
+  background: var(--bg-tertiary, #1A1A2E);
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.recentCard:hover {
+  border-color: var(--accent, #A78BFA);
+  background: var(--bg-card-hover, #1E2D4F);
+}
+
+.recentName {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+
+.recentMeta {
+  font-size: 9px;
+  color: var(--text-muted, #6B7080);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Page Header */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.pageTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pageSubtitle {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.btnPrimary {
+  padding: 5px 10px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  transition: var(--transition);
+  background: linear-gradient(135deg, var(--accent), #7C3AED);
+  color: #fff;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.22);
+}
+
+/* Filter Bar */
+.filterBar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filterTab {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: var(--transition);
+}
+
+.filterTab:hover {
+  background: var(--bg-hover);
+}
+
+.filterTabActive {
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.filterTabActive:hover {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.searchInput {
+  padding: 5px 10px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  width: 180px;
+  outline: none;
+  margin-left: auto;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: var(--transition);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.searchInput:focus {
+  border-color: rgba(167, 139, 250, 0.5);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+/* Project Grid */
+.projectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+/* Project Card */
+.projectCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.projectCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-medium);
+  background: var(--bg-hover);
+}
+
+/* Thumbnail */
+.projectThumb {
+  height: 120px;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.projectThumbPlaceholder {
+  color: var(--text-tertiary);
+  font-size: 28px;
+  user-select: none;
+}
+
+.projectStatusBar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.badgeDesigning {
+  background: var(--blue-dim);
+  color: var(--blue);
+}
+
+.badgeReview {
+  background: var(--orange-dim);
+  color: var(--orange);
+}
+
+.badgeDev {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.badgeDone {
+  background: var(--green-dim);
+  color: var(--green);
+}
+
+/* Project Body */
+.projectBody {
+  padding: 10px 12px;
+}
+
+.projectName {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: var(--text-primary);
+}
+
+.projectDesc {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Meta */
+.projectMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.projectPeople {
+  display: flex;
+}
+
+.projectAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 2px solid var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-left: -6px;
+}
+
+.projectAvatar:first-child {
+  margin-left: 0;
+}
+
+.avatarDesign {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.avatarDev {
+  background: var(--blue-dim);
+  color: var(--blue);
+}
+
+.projectDate {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+/* Handoff Bar */
+.handoffBar {
+  display: flex;
+  gap: 3px;
+  margin-top: 8px;
+}
+
+.handoffSeg {
+  height: 3px;
+  border-radius: 2px;
+}
+
+.handoffPending {
+  background: var(--bg-hover);
+}
+
+.handoffProgress {
+  background: var(--blue);
+}
+
+.handoffDone {
+  background: var(--green);
+}
+
+.handoffLabel {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+}

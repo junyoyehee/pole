@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pole - 로그인</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0C0C0F;
+      --bg-secondary: #131317;
+      --bg-tertiary: #1A1A20;
+      --bg-elevated: #202028;
+      --bg-hover: #24242E;
+      --bg-active: #2A2A36;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-medium: rgba(255,255,255,0.09);
+      --border-focus: rgba(167,139,250,0.5);
+      --text-primary: #EDEDF0;
+      --text-secondary: #9898A6;
+      --text-tertiary: #5C5C72;
+      --text-muted: #44445A;
+      --accent: #A78BFA;
+      --accent-bright: #C4B5FD;
+      --accent-dim: rgba(167,139,250,0.12);
+      --accent-glow: rgba(167,139,250,0.22);
+      --teal: #2DD4BF;
+      --teal-dim: rgba(45,212,191,0.10);
+      --blue: #60A5FA;
+      --blue-dim: rgba(96,165,250,0.10);
+      --green: #4ADE80;
+      --green-dim: rgba(74,222,128,0.10);
+      --orange: #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --pink: #F472B6;
+      --pink-dim: rgba(244,114,182,0.10);
+      --yellow: #FACC15;
+      --yellow-dim: rgba(250,204,21,0.08);
+      --cyan: #22D3EE;
+      --cyan-dim: rgba(34,211,238,0.10);
+      --indigo: #818CF8;
+      --indigo-dim: rgba(129,140,248,0.10);
+      --red: #F87171;
+      --red-dim: rgba(248,113,113,0.10);
+      --gray-badge: #71717A;
+      --gray-badge-dim: rgba(113,113,122,0.12);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-md: 0 4px 24px rgba(0,0,0,0.55);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.65);
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; -webkit-font-smoothing: antialiased; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    .login-container { width: 100%; max-width: 400px; padding: 20px; }
+    .login-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 36px 28px; box-shadow: var(--shadow-lg); }
+    .logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
+    .logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent), #7C3AED); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; box-shadow: 0 0 20px var(--accent-glow); }
+    .logo-text { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+    .title { text-align: center; font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .subtitle { text-align: center; font-size: 13px; color: var(--text-tertiary); margin-bottom: 24px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; }
+    .form-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); font-size: 14px; font-family: var(--font-sans); color: var(--text-primary); background: var(--bg-primary); outline: none; transition: var(--transition); }
+    .form-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+    .checkbox-label input { width: 15px; height: 15px; accent-color: var(--accent); }
+    .forgot-link { font-size: 13px; color: var(--accent); text-decoration: none; transition: var(--transition); }
+    .forgot-link:hover { color: var(--accent-bright); }
+    .btn-login { width: 100%; height: 38px; padding: 0 14px; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; font-family: var(--font-sans); cursor: pointer; background: linear-gradient(135deg, var(--accent), #7C3AED); color: #fff; transition: var(--transition); }
+    .btn-login:hover { opacity: 0.9; box-shadow: 0 0 20px var(--accent-glow); }
+    .invite-note { text-align: center; margin-top: 20px; padding: 14px; background: var(--bg-tertiary); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-tertiary); line-height: 1.5; }
+    .error-msg { background: var(--red-dim); border: 1px solid rgba(248,113,113,0.2); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; color: var(--red); margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="logo">
+        <div class="logo-icon">P</div>
+        <span class="logo-text">Pole</span>
+      </div>
+      <div class="title">팀 인트라넷 로그인</div>
+      <div class="subtitle">팀 계정으로 로그인하세요</div>
+      <div class="error-msg">이메일 또는 비밀번호가 올바르지 않습니다.</div>
+      <form>
+        <div class="form-group">
+          <label class="form-label">이메일</label>
+          <input type="email" class="form-input" placeholder="name@company.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">비밀번호</label>
+          <input type="password" class="form-input" placeholder="비밀번호를 입력하세요">
+        </div>
+        <div class="form-row">
+          <label class="checkbox-label"><input type="checkbox"> 로그인 유지</label>
+          <a href="#" class="forgot-link">비밀번호 찾기</a>
+        </div>
+        <button type="submit" class="btn-login">로그인</button>
+      </form>
+      <div class="invite-note">계정이 없으신가요?<br>관리자에게 초대 링크를 요청해 주세요.</div>
+    </div>
+  </div>
+</body>
+</html>
