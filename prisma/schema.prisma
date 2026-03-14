@@ -34,8 +34,8 @@ model User {
 model FigmaProject {
   id           String   @id @default(uuid())
   name         String
-  figmaUrl     String   @map("figma_url")
-  fileKey      String   @map("file_key")
+  figmaUrl     String?  @map("figma_url")
+  fileKey      String?  @map("file_key")
   description  String?
   status       String   @default("DESIGNING") // DESIGNING, IN_REVIEW, IN_DEV, DONE
   designerId   String   @map("designer_id")
@@ -55,9 +55,11 @@ model DesignReview {
   title          String
   description    String?
   figmaNodeId    String?  @map("figma_node_id")
+  figmaUrl       String?  @map("figma_url")
   status         String   @default("OPEN") // OPEN, IN_REVISION, APPROVED
   authorId       String   @map("author_id")
   dueDate        String?  @map("due_date")
+  previewImages  String?  @map("preview_images") // JSON array
   createdAt      DateTime @default(now()) @map("created_at")
 
   figmaProject FigmaProject     @relation(fields: [figmaProjectId], references: [id], onDelete: Cascade)
@@ -94,6 +96,7 @@ model Handoff {
   priority       String   @default("NORMAL") // HIGH, NORMAL, LOW
   specData       String?  @map("spec_data") // JSON string
   notes          String?
+  previewImages  String?  @map("preview_images") // JSON array of {url, source, reason}
   createdAt      DateTime @default(now()) @map("created_at")
 
   figmaProject FigmaProject @relation(fields: [figmaProjectId], references: [id], onDelete: Cascade)

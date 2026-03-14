@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     for (let i = 0; i < nodes.length; i += batchSize) {
       const batch = nodes.slice(i, i + batchSize);
-      const ids = batch.map((n) => n.id.replace("-", ":")).join(",");
+      const ids = batch.map((n) => n.id.replaceAll("-", ":")).join(",");
 
       const params = new URLSearchParams({
         ids,
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       const images: Record<string, string | null> = figmaData.images || {};
 
       for (const node of batch) {
-        const figmaId = node.id.replace("-", ":");
+        const figmaId = node.id.replaceAll("-", ":");
         const imageUrl = images[figmaId];
 
         if (!imageUrl) {

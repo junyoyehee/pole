@@ -1,32 +1,52 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import Link from "next/link";
 import Header from "@/components/Header";
 import {
   IconPlus,
-  IconSearch,
   IconList,
   IconLayoutKanban,
   IconExternalLink,
   IconArrowRight,
+  IconPhoto,
 } from "@tabler/icons-react";
 import styles from "./page.module.css";
 
 type Status = "대기" | "진행중" | "구현완료" | "검수완료";
 type Priority = "높음" | "보통" | "낮음";
 
+interface SavedImage {
+  url: string;
+  source: string;
+  reason: string;
+}
+
 interface HandoffItem {
-  id: number;
+  id: string;
   name: string;
-  icon: string;
   designer: string;
   developer: string;
   status: Status;
   priority: Priority;
   figmaUrl: string;
+  previewImages: SavedImage[];
   specs: { label: string; value: string }[];
   notes: string[];
 }
+
+const STATUS_MAP: Record<string, Status> = {
+  PENDING: "대기",
+  IN_PROGRESS: "진행중",
+  IMPLEMENTED: "구현완료",
+  VERIFIED: "검수완료",
+};
+
+const PRIORITY_MAP: Record<string, Priority> = {
+  HIGH: "높음",
+  NORMAL: "보통",
+  LOW: "낮음",
+};
 
 const STATUSES: Status[] = ["대기", "진행중", "구현완료", "검수완료"];
 
@@ -56,235 +76,118 @@ const PRIORITY_BADGE: Record<Priority, string> = {
   "낮음": styles.priorityBadgeLow,
 };
 
-const HANDOFF_DATA: HandoffItem[] = [
-  {
-    id: 1,
-    name: "LoginForm",
-    icon: "🔐",
-    designer: "김디자",
-    developer: "김민수",
-    status: "진행중",
-    priority: "높음",
-    figmaUrl: "https://figma.com/file/login-form",
-    specs: [
-      { label: "너비", value: "400px" },
-      { label: "패딩", value: "32px" },
-      { label: "배경", value: "#FFFFFF" },
-      { label: "보더", value: "1px solid #E9ECEF, radius 12px" },
-      { label: "그림자", value: "0 4px 24px rgba(0,0,0,0.06)" },
-    ],
-    notes: [
-      "비밀번호 필드에 눈 아이콘(표시/숨기기) 토글 추가 필요",
-      "소셜 로그인 버튼은 Google, GitHub 2가지",
-      "에러 메시지 WCAG AA 기준 대비율 확인 완료",
-      "로딩 상태 시 버튼에 스피너 표시",
-    ],
-  },
-  {
-    id: 2,
-    name: "DashboardWidget",
-    icon: "📊",
-    designer: "윤서아",
-    developer: "일달러",
-    status: "진행중",
-    priority: "높음",
-    figmaUrl: "https://figma.com/file/dashboard-widget",
-    specs: [
-      { label: "너비", value: "100%" },
-      { label: "최소 높이", value: "280px" },
-      { label: "패딩", value: "24px" },
-      { label: "보더", value: "1px solid var(--border-subtle)" },
-    ],
-    notes: [
-      "차트 라이브러리는 Recharts 사용",
-      "반응형 브레이크포인트: 768px, 1024px",
-      "데이터 로딩 시 스켈레톤 UI 적용",
-    ],
-  },
-  {
-    id: 3,
-    name: "UserProfileCard",
-    icon: "👤",
-    designer: "김디자",
-    developer: "김민수",
-    status: "구현완료",
-    priority: "보통",
-    figmaUrl: "https://figma.com/file/user-profile",
-    specs: [
-      { label: "너비", value: "320px" },
-      { label: "아바타 크기", value: "64px" },
-      { label: "보더 반경", value: "12px" },
-    ],
-    notes: [
-      "아바타 이미지 lazy loading 적용",
-      "온라인 상태 인디케이터 포함",
-    ],
-  },
-  {
-    id: 4,
-    name: "NotificationPanel",
-    icon: "🔔",
-    designer: "윤서아",
-    developer: "이수진",
-    status: "대기",
-    priority: "보통",
-    figmaUrl: "https://figma.com/file/notification",
-    specs: [
-      { label: "너비", value: "380px" },
-      { label: "최대 높이", value: "480px" },
-      { label: "아이템 높이", value: "64px" },
-    ],
-    notes: [
-      "읽음/안읽음 상태 시각 구분",
-      "무한 스크롤 적용",
-      "알림 타입별 아이콘 구분 필요",
-    ],
-  },
-  {
-    id: 5,
-    name: "TaskCard",
-    icon: "📋",
-    designer: "김디자",
-    developer: "일달러",
-    status: "검수완료",
-    priority: "보통",
-    figmaUrl: "https://figma.com/file/task-card",
-    specs: [
-      { label: "너비", value: "100%" },
-      { label: "패딩", value: "16px" },
-      { label: "보더 반경", value: "8px" },
-    ],
-    notes: [
-      "드래그 앤 드롭 지원",
-      "우선순위 컬러 코딩 적용",
-    ],
-  },
-  {
-    id: 6,
-    name: "SideNavigation",
-    icon: "🧭",
-    designer: "김디자",
-    developer: "김민수",
-    status: "검수완료",
-    priority: "낮음",
-    figmaUrl: "https://figma.com/file/side-nav",
-    specs: [
-      { label: "너비", value: "240px (확장), 64px (축소)" },
-      { label: "배경", value: "var(--bg-secondary)" },
-    ],
-    notes: [
-      "축소/확장 애니메이션 적용",
-      "활성 메뉴 하이라이트",
-      "키보드 네비게이션 지원",
-    ],
-  },
-  {
-    id: 7,
-    name: "DesignReviewPanel",
-    icon: "🎨",
-    designer: "윤서아",
-    developer: "미정",
-    status: "대기",
-    priority: "높음",
-    figmaUrl: "https://figma.com/file/design-review",
-    specs: [
-      { label: "너비", value: "100%" },
-      { label: "최소 높이", value: "600px" },
-    ],
-    notes: [
-      "코멘트 스레드 기능 포함",
-      "이미지 비교 뷰어 (Before/After)",
-      "승인/반려 워크플로우 구현 필요",
-    ],
-  },
-  {
-    id: 8,
-    name: "MarkdownEditor",
-    icon: "📝",
-    designer: "김디자",
-    developer: "미정",
-    status: "대기",
-    priority: "낮음",
-    figmaUrl: "https://figma.com/file/markdown-editor",
-    specs: [
-      { label: "너비", value: "100%" },
-      { label: "최소 높이", value: "400px" },
-      { label: "툴바 높이", value: "44px" },
-    ],
-    notes: [
-      "실시간 미리보기 분할 뷰",
-      "이미지 드래그 앤 드롭 업로드",
-      "코드 블록 구문 강조",
-    ],
-  },
-  {
-    id: 9,
-    name: "DataTable",
-    icon: "📑",
-    designer: "윤서아",
-    developer: "조수빈",
-    status: "진행중",
-    priority: "보통",
-    figmaUrl: "https://figma.com/file/data-table",
-    specs: [
-      { label: "너비", value: "100%" },
-      { label: "행 높이", value: "48px" },
-      { label: "헤더 높이", value: "40px" },
-    ],
-    notes: [
-      "컬럼 정렬 기능",
-      "행 선택 및 다중 선택",
-      "페이지네이션 포함",
-    ],
-  },
-  {
-    id: 10,
-    name: "FileUploader",
-    icon: "📤",
-    designer: "김디자",
-    developer: "이수진",
-    status: "구현완료",
-    priority: "높음",
-    figmaUrl: "https://figma.com/file/file-uploader",
-    specs: [
-      { label: "드롭존 높이", value: "200px" },
-      { label: "최대 파일 크기", value: "50MB" },
-      { label: "보더", value: "2px dashed var(--border-medium)" },
-    ],
-    notes: [
-      "드래그 앤 드롭 업로드 지원",
-      "업로드 진행률 표시",
-      "파일 타입 제한 (이미지, PDF)",
-    ],
-  },
-];
+function parseSpecData(specData: string | null): { label: string; value: string }[] {
+  if (!specData) return [];
+  try {
+    const parsed = JSON.parse(specData);
+    return Object.entries(parsed).map(([label, value]) => ({
+      label,
+      value: String(value),
+    }));
+  } catch {
+    return specData
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => {
+        const [label, ...rest] = line.split(":");
+        return { label: label.trim(), value: rest.join(":").trim() };
+      });
+  }
+}
 
-const ASSIGNEES = Array.from(
-  new Set(HANDOFF_DATA.map((item) => item.developer))
-).sort();
+function parseNotes(notes: string | null): string[] {
+  if (!notes) return [];
+  return notes.split("\n").filter(Boolean);
+}
+
+interface ApiHandoff {
+  id: string;
+  componentName: string;
+  figmaUrl: string | null;
+  status: string;
+  priority: string;
+  specData: string | null;
+  notes: string | null;
+  previewImages: string | null;
+  figmaProject: { name: string; fileKey: string; designerId: string; designer: { name: string } };
+  developer: { name: string };
+}
+
+function parsePreviewImages(raw: string | null): SavedImage[] {
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function mapApiToItem(h: ApiHandoff): HandoffItem {
+  return {
+    id: h.id,
+    name: h.componentName,
+    designer: h.figmaProject.designer.name,
+    developer: h.developer.name,
+    status: STATUS_MAP[h.status] ?? "대기",
+    priority: PRIORITY_MAP[h.priority] ?? "보통",
+    figmaUrl: h.figmaUrl ?? "",
+    previewImages: parsePreviewImages(h.previewImages),
+    specs: parseSpecData(h.specData),
+    notes: parseNotes(h.notes),
+  };
+}
 
 export default function HandoffPage() {
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
-  const [selectedId, setSelectedId] = useState<number>(1);
+  const [selectedId, setSelectedId] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("전체");
   const [filterPriority, setFilterPriority] = useState<string>("전체");
   const [filterAssignee, setFilterAssignee] = useState<string>("전체");
   const [search, setSearch] = useState("");
+  const [items, setItems] = useState<HandoffItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/v1/handoffs")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          const mapped = (data.data as ApiHandoff[]).map(mapApiToItem);
+          setItems(mapped);
+          if (mapped.length > 0) setSelectedId(mapped[0].id);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const assignees = useMemo(
+    () => Array.from(new Set(items.map((item) => item.developer))).sort(),
+    [items]
+  );
 
   const filtered = useMemo(() => {
-    return HANDOFF_DATA.filter((item) => {
+    return items.filter((item) => {
       if (filterStatus !== "전체" && item.status !== filterStatus) return false;
-      if (filterPriority !== "전체" && item.priority !== filterPriority)
-        return false;
-      if (filterAssignee !== "전체" && item.developer !== filterAssignee)
-        return false;
-      if (search && !item.name.toLowerCase().includes(search.toLowerCase()))
-        return false;
+      if (filterPriority !== "전체" && item.priority !== filterPriority) return false;
+      if (filterAssignee !== "전체" && item.developer !== filterAssignee) return false;
+      if (search && !item.name.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [filterStatus, filterPriority, filterAssignee, search]);
+  }, [items, filterStatus, filterPriority, filterAssignee, search]);
 
-  const selectedItem = HANDOFF_DATA.find((item) => item.id === selectedId);
+  const selectedItem = items.find((item) => item.id === selectedId);
+
+  if (loading) {
+    return (
+      <>
+        <Header breadcrumb="핸드오프" />
+        <div className={styles.content}>
+          <div className={styles.emptyState}>데이터를 불러오는 중...</div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -298,10 +201,10 @@ export default function HandoffPage() {
               총 {filtered.length}개 항목
             </div>
           </div>
-          <button className={styles.btnPrimary}>
+          <Link href="/handoff/register" className={styles.btnPrimary} style={{ textDecoration: "none" }}>
             <IconPlus size={14} />
             핸드오프 등록
-          </button>
+          </Link>
         </div>
 
         {/* Toolbar */}
@@ -353,7 +256,7 @@ export default function HandoffPage() {
             onChange={(e) => setFilterAssignee(e.target.value)}
           >
             <option value="전체">전체 담당자</option>
-            {ASSIGNEES.map((a) => (
+            {assignees.map((a) => (
               <option key={a} value={a}>
                 {a}
               </option>
@@ -385,6 +288,59 @@ export default function HandoffPage() {
   );
 }
 
+/* ===== DESIGN PREVIEW ===== */
+
+function DesignPreview({ images }: { images: SavedImage[] }) {
+  const [selectedIdx, setSelectedIdx] = useState(0);
+
+  if (images.length === 0) {
+    return (
+      <div className={styles.designPreview}>
+        <div className={styles.previewPlaceholder}>
+          <IconPhoto size={20} />
+          <span>미리보기 이미지 없음</span>
+        </div>
+      </div>
+    );
+  }
+
+  const current = images[selectedIdx] ?? images[0];
+
+  return (
+    <div className={styles.previewSection}>
+      <div className={styles.designPreview} style={{ padding: 0 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={current.url}
+          alt="디자인 미리보기"
+          className={styles.previewImage}
+        />
+        {current.reason && (
+          <div className={styles.previewCaption}>{current.reason}</div>
+        )}
+      </div>
+      {images.length > 1 && (
+        <div className={styles.previewThumbs}>
+          {images.map((img, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className={`${styles.previewThumb} ${idx === selectedIdx ? styles.previewThumbActive : ""}`}
+              onClick={() => setSelectedIdx(idx)}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={img.url} alt="" className={styles.previewThumbImg} />
+              <span className={styles.previewThumbSource}>
+                {img.source === "ai" ? "AI" : img.source === "clipboard" ? "붙여넣기" : "업로드"}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ===== LIST VIEW ===== */
 
 function ListView({
@@ -394,9 +350,9 @@ function ListView({
   onSelect,
 }: {
   items: HandoffItem[];
-  selectedId: number;
+  selectedId: string;
   selectedItem: HandoffItem | null;
-  onSelect: (id: number) => void;
+  onSelect: (id: string) => void;
 }) {
   return (
     <div className={styles.listLayout}>
@@ -420,7 +376,7 @@ function ListView({
               className={`${styles.handoffItem} ${item.id === selectedId ? styles.handoffItemActive : ""}`}
               onClick={() => onSelect(item.id)}
             >
-              <div className={styles.handoffThumb}>{item.icon}</div>
+              <div className={styles.handoffThumb}>📦</div>
               <div className={styles.handoffInfo}>
                 <div className={styles.handoffName}>{item.name}</div>
                 <div className={styles.handoffMeta}>
@@ -465,49 +421,53 @@ function ListView({
               </div>
             </div>
             <div className={styles.detailBody}>
-              <div className={styles.designPreview}>
-                {selectedItem.icon} Figma 디자인 미리보기 ({selectedItem.name})
-              </div>
+              <DesignPreview images={selectedItem.previewImages} />
 
-              <div className={styles.specSection}>
-                <div className={styles.specTitle}>디자인 스펙</div>
-                <table className={styles.specTable}>
-                  <thead>
-                    <tr>
-                      <th>속성</th>
-                      <th>값</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedItem.specs.map((spec, idx) => (
-                      <tr key={idx}>
-                        <td>{spec.label}</td>
-                        <td>{spec.value}</td>
+              {selectedItem.specs.length > 0 && (
+                <div className={styles.specSection}>
+                  <div className={styles.specTitle}>디자인 스펙</div>
+                  <table className={styles.specTable}>
+                    <thead>
+                      <tr>
+                        <th>속성</th>
+                        <th>값</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className={styles.specSection}>
-                <div className={styles.specTitle}>참고사항</div>
-                <div className={styles.notesContent}>
-                  {selectedItem.notes.map((note, idx) => (
-                    <p key={idx}>• {note}</p>
-                  ))}
+                    </thead>
+                    <tbody>
+                      {selectedItem.specs.map((spec, idx) => (
+                        <tr key={idx}>
+                          <td>{spec.label}</td>
+                          <td>{spec.value}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              </div>
+              )}
+
+              {selectedItem.notes.length > 0 && (
+                <div className={styles.specSection}>
+                  <div className={styles.specTitle}>참고사항</div>
+                  <div className={styles.notesContent}>
+                    {selectedItem.notes.map((note, idx) => (
+                      <p key={idx}>• {note}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div className={styles.detailActions}>
-              <a
-                href={selectedItem.figmaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.btnViolet}
-              >
-                <IconExternalLink size={14} />
-                Figma에서 보기
-              </a>
+              {selectedItem.figmaUrl && (
+                <a
+                  href={selectedItem.figmaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.btnViolet}
+                >
+                  <IconExternalLink size={14} />
+                  Figma에서 보기
+                </a>
+              )}
               <button className={styles.btnGreen}>
                 <IconArrowRight size={14} />
                 {selectedItem.status === "구현완료" ? "검수 완료" : "구현 완료"}
@@ -552,7 +512,7 @@ function KanbanView({ items }: { items: HandoffItem[] }) {
               {colItems.map((item) => (
                 <div key={item.id} className={styles.kanbanCard}>
                   <div className={styles.kanbanCardName}>
-                    {item.icon} {item.name}
+                    📦 {item.name}
                   </div>
                   <div className={styles.kanbanCardMeta}>
                     <div className={styles.kanbanCardRow}>
@@ -561,16 +521,18 @@ function KanbanView({ items }: { items: HandoffItem[] }) {
                       >
                         {item.priority}
                       </span>
-                      <a
-                        href={item.figmaUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.figmaLink}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Figma
-                        <IconExternalLink size={10} />
-                      </a>
+                      {item.figmaUrl && (
+                        <a
+                          href={item.figmaUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.figmaLink}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Figma
+                          <IconExternalLink size={10} />
+                        </a>
+                      )}
                     </div>
                   </div>
                   <div className={styles.kanbanCardFooter}>

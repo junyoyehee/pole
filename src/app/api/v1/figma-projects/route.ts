@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, figmaUrl, fileKey, description, status: projectStatus, designerId, thumbnailUrl } = body;
 
-    if (!name || !figmaUrl || !fileKey) {
-      return error("MISSING_FIELDS", "name, figmaUrl, fileKey are required");
+    if (!name) {
+      return error("MISSING_FIELDS", "name is required");
     }
 
     // designerId가 없으면 첫 번째 사용자를 자동 할당
@@ -57,11 +57,11 @@ export async function POST(request: NextRequest) {
     const item = await prisma.figmaProject.create({
       data: {
         name,
-        figmaUrl,
-        fileKey,
+        figmaUrl: figmaUrl || null,
+        fileKey: fileKey || null,
         description: description || null,
         status: projectStatus || "DESIGNING",
-        designerId: resolvedDesignerId,
+        designer: { connect: { id: resolvedDesignerId } },
         thumbnailUrl: thumbnailUrl || null,
       },
       include: {

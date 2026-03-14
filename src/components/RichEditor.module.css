@@ -1,0 +1,141 @@
+/* ===== Rich Editor ===== */
+.richEditor {
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.editorToolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+}
+
+.toolbarGroup {
+  display: flex;
+  gap: 1px;
+}
+
+.toolbarBtn {
+  padding: 4px 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  transition: var(--transition);
+}
+
+.toolbarBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.toolbarBtnActive {
+  background: var(--accent-dim);
+  color: var(--accent-bright);
+}
+
+.toolbarDivider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-subtle);
+  margin: 0 4px;
+}
+
+.toolbarSpacer {
+  flex: 1;
+}
+
+.toolbarLabel {
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.editorTextarea {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  font-size: 11px;
+  background: transparent;
+  color: var(--text-primary);
+  outline: none;
+  resize: vertical;
+  line-height: 1.6;
+  font-family: var(--font-mono);
+}
+
+.editorTextarea::placeholder {
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 10px;
+}
+
+.editorPreview {
+  padding: 10px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  overflow-y: auto;
+}
+
+.editorPreview img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+.editorPreview strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Attachments */
+.attachmentList {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 6px 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.attachmentItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  font-size: 9px;
+  color: var(--text-tertiary);
+}
+
+.attachmentName {
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attachmentRemove {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.attachmentRemove:hover {
+  color: var(--red);
+}

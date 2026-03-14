@@ -601,7 +601,7 @@ function FigmaExplorer() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             fileKey,
-            nodes: targetNodes.map((n) => ({ id: n.id.replace("-", ":"), name: n.name })),
+            nodes: targetNodes.map((n) => ({ id: n.id.replaceAll("-", ":"), name: n.name })),
             format: exportFormat || "png",
             scale: Number(exportScale) || 2,
           }),
@@ -612,20 +612,21 @@ function FigmaExplorer() {
           return;
         }
 
-        // 2. Download each image and save to chosen folder
+        // 2. Download each image via server proxy and save to chosen folder
         let savedCount = 0;
         for (const item of data.data.results) {
           if (item.status !== "success" || !item.imageUrl) continue;
           try {
-            const imgRes = await fetch(item.imageUrl);
-            const blob = await imgRes.blob();
+            // Figma S3 URL은 CORS 제한이 있으므로 서버 프록시 사용
+            const proxyRes = await fetch(`/api/figma/images?url=${encodeURIComponent(item.imageUrl)}`);
+            const blob = await proxyRes.blob();
             const fileHandle = await dirHandle.getFileHandle(item.fileName, { create: true });
             const writable = await fileHandle.createWritable();
             await writable.write(blob);
             await writable.close();
             savedCount++;
-          } catch {
-            // skip individual failures
+          } catch (err) {
+            console.error(`이미지 저장 실패 (${item.fileName}):`, err);
           }
         }
 
@@ -1150,6 +1151,16 @@ function FigmaExplorer() {
                     fz={9}
                   >
                     허브에 등록
+                  </Button>
+                  <Button
+                    component="a"
+                    href={`/design-review/request?figmaUrl=${encodeURIComponent(url)}`}
+                    size="compact-xs"
+                    variant="gradient"
+                    gradient={{ from: "grape", to: "violet" }}
+                    fz={9}
+                  >
+                    리뷰 등록
                   </Button>
                 </Group>
               </Stack>

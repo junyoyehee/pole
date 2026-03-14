@@ -11,8 +11,19 @@ export async function GET(
     where: { id },
     include: {
       designer: { select: { id: true, name: true, avatarUrl: true, part: true } },
-      reviews: { include: { author: { select: { id: true, name: true } } } },
-      handoffs: { include: { developer: { select: { id: true, name: true } } } },
+      reviews: {
+        include: {
+          author: { select: { id: true, name: true } },
+          _count: { select: { feedbacks: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      },
+      handoffs: {
+        include: {
+          developer: { select: { id: true, name: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      },
     },
   });
 

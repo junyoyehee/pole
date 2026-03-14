@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import Link from "next/link";
 import Header from "@/components/Header";
+import RichEditor, { renderMarkdown, type Attachment } from "@/components/RichEditor";
 import {
   IconPlus,
   IconSearch,
@@ -9,137 +11,123 @@ import {
   IconCalendar,
   IconExternalLink,
   IconBrandFigma,
+  IconPhoto,
+  IconSend,
+  IconCheck,
+  IconAlertCircle,
+  IconMessagePlus,
 } from "@tabler/icons-react";
 import styles from "./page.module.css";
 
 type ReviewStatus = "진행중" | "수정중" | "승인완료";
 
-interface Reviewer {
-  name: string;
-  initial: string;
-  color: string;
-  bgColor: string;
+interface SavedImage {
+  url: string;
+  source: string;
+  reason: string;
+}
+
+interface Feedback {
+  id: string;
+  content: string;
+  category: string;
+  priority: string;
+  type: string;
+  createdAt: string;
+  author: { name: string };
 }
 
 interface DesignReview {
-  id: number;
+  id: string;
   title: string;
-  figmaLink: string;
+  figmaUrl: string;
+  figmaProjectUrl: string;
+  projectName: string;
   requester: string;
   requesterInitial: string;
-  reviewers: Reviewer[];
   status: ReviewStatus;
   deadline: string;
   feedbackCount: number;
   createdAt: string;
   description: string;
+  previewImages: SavedImage[];
+  feedbacks: Feedback[];
 }
 
-const REVIEWS: DesignReview[] = [
-  {
-    id: 1,
-    title: "로그인 화면 v3 리뷰",
-    figmaLink: "https://figma.com/file/abc123",
-    requester: "김디자",
-    requesterInitial: "김",
-    reviewers: [
-      { name: "일달러", initial: "일", color: "var(--blue)", bgColor: "var(--blue-dim)" },
-      { name: "김민수", initial: "김", color: "var(--accent)", bgColor: "var(--accent-dim)" },
-      { name: "최지은", initial: "최", color: "var(--orange)", bgColor: "var(--orange-dim)" },
-    ],
-    status: "진행중",
-    deadline: "2026.03.15",
-    feedbackCount: 4,
-    createdAt: "2026.03.10",
-    description: "로그인 페이지 UI 개선 - 소셜 로그인 추가 및 레이아웃 변경",
-  },
-  {
-    id: 2,
-    title: "대시보드 메인 위젯 리디자인",
-    figmaLink: "https://figma.com/file/def456",
-    requester: "윤서아",
-    requesterInitial: "윤",
-    reviewers: [
-      { name: "정하늘", initial: "정", color: "var(--green)", bgColor: "var(--green-dim)" },
-      { name: "일달러", initial: "일", color: "var(--blue)", bgColor: "var(--blue-dim)" },
-    ],
-    status: "수정중",
-    deadline: "2026.03.14",
-    feedbackCount: 7,
-    createdAt: "2026.03.08",
-    description: "대시보드 핵심 위젯 카드 스타일 및 데이터 시각화 개선",
-  },
-  {
-    id: 3,
-    title: "모바일 네비게이션 바 디자인",
-    figmaLink: "https://figma.com/file/ghi789",
-    requester: "김디자",
-    requesterInitial: "김",
-    reviewers: [
-      { name: "박서연", initial: "박", color: "var(--accent)", bgColor: "var(--accent-dim)" },
-      { name: "최유진", initial: "최", color: "var(--orange)", bgColor: "var(--orange-dim)" },
-      { name: "김민수", initial: "김", color: "var(--blue)", bgColor: "var(--blue-dim)" },
-      { name: "조수빈", initial: "조", color: "var(--green)", bgColor: "var(--green-dim)" },
-    ],
-    status: "승인완료",
-    deadline: "2026.03.12",
-    feedbackCount: 5,
-    createdAt: "2026.03.05",
-    description: "반응형 모바일 하단 네비게이션 및 제스처 인터랙션",
-  },
-  {
-    id: 4,
-    title: "프로필 설정 페이지 UI",
-    figmaLink: "https://figma.com/file/jkl012",
-    requester: "윤서아",
-    requesterInitial: "윤",
-    reviewers: [
-      { name: "일달러", initial: "일", color: "var(--blue)", bgColor: "var(--blue-dim)" },
-      { name: "정하늘", initial: "정", color: "var(--green)", bgColor: "var(--green-dim)" },
-    ],
-    status: "진행중",
-    deadline: "2026.03.18",
-    feedbackCount: 2,
-    createdAt: "2026.03.12",
-    description: "사용자 프로필 편집, 알림 설정, 테마 설정 페이지",
-  },
-  {
-    id: 5,
-    title: "알림 센터 드롭다운 디자인",
-    figmaLink: "https://figma.com/file/mno345",
-    requester: "김디자",
-    requesterInitial: "김",
-    reviewers: [
-      { name: "김민수", initial: "김", color: "var(--accent)", bgColor: "var(--accent-dim)" },
-      { name: "최지은", initial: "최", color: "var(--orange)", bgColor: "var(--orange-dim)" },
-    ],
-    status: "수정중",
-    deadline: "2026.03.16",
-    feedbackCount: 3,
-    createdAt: "2026.03.11",
-    description: "실시간 알림 목록, 읽음/안읽음 상태, 알림 카테고리 필터",
-  },
-  {
-    id: 6,
-    title: "온보딩 플로우 일러스트",
-    figmaLink: "https://figma.com/file/pqr678",
-    requester: "윤서아",
-    requesterInitial: "윤",
-    reviewers: [
-      { name: "정하늘", initial: "정", color: "var(--green)", bgColor: "var(--green-dim)" },
-      { name: "최유진", initial: "최", color: "var(--orange)", bgColor: "var(--orange-dim)" },
-      { name: "일달러", initial: "일", color: "var(--blue)", bgColor: "var(--blue-dim)" },
-    ],
-    status: "승인완료",
-    deadline: "2026.03.10",
-    feedbackCount: 6,
-    createdAt: "2026.03.03",
-    description: "신규 사용자 온보딩 3단계 플로우 및 일러스트레이션",
-  },
-];
+const STATUS_MAP: Record<string, ReviewStatus> = {
+  OPEN: "진행중",
+  IN_REVISION: "수정중",
+  APPROVED: "승인완료",
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  UI: "UI",
+  UX: "UX",
+  A11Y: "접근성",
+  TECHNICAL: "기술",
+  OTHER: "기타",
+};
+
+const TYPE_LABELS: Record<string, string> = {
+  COMMENT: "코멘트",
+  CHANGE_REQUEST: "수정 요청",
+  APPROVAL: "승인",
+};
+
+const TYPE_STYLE: Record<string, string> = {
+  COMMENT: styles.feedbackTypeComment,
+  CHANGE_REQUEST: styles.feedbackTypeChange,
+  APPROVAL: styles.feedbackTypeApproval,
+};
+
+interface ApiReview {
+  id: string;
+  title: string;
+  description: string | null;
+  figmaUrl: string | null;
+  status: string;
+  dueDate: string | null;
+  previewImages: string | null;
+  createdAt: string;
+  figmaProject: { name: string; figmaUrl: string };
+  author: { name: string };
+  feedbacks: {
+    id: string;
+    content: string;
+    category: string;
+    priority: string;
+    type: string;
+    createdAt: string;
+    author: { name: string };
+  }[];
+}
+
+function mapApiToReview(r: ApiReview): DesignReview {
+  let images: SavedImage[] = [];
+  if (r.previewImages) {
+    try { images = JSON.parse(r.previewImages); } catch {}
+  }
+
+  return {
+    id: r.id,
+    title: r.title,
+    figmaUrl: r.figmaUrl || "",
+    figmaProjectUrl: r.figmaProject.figmaUrl,
+    projectName: r.figmaProject.name,
+    requester: r.author.name,
+    requesterInitial: r.author.name.charAt(0),
+    status: STATUS_MAP[r.status] ?? "진행중",
+    deadline: r.dueDate ?? "-",
+    feedbackCount: r.feedbacks.length,
+    createdAt: new Date(r.createdAt).toLocaleDateString("ko-KR"),
+    description: r.description ?? "",
+    previewImages: images,
+    feedbacks: r.feedbacks,
+  };
+}
 
 const STATUS_TABS: (ReviewStatus | null)[] = [null, "진행중", "수정중", "승인완료"];
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS_MAP: Record<string, string> = {
   all: "전체",
   "진행중": "진행중",
   "수정중": "수정중",
@@ -155,26 +143,58 @@ const STATUS_STYLE: Record<ReviewStatus, string> = {
 export default function DesignReviewPage() {
   const [activeStatus, setActiveStatus] = useState<ReviewStatus | null>(null);
   const [search, setSearch] = useState("");
+  const [reviews, setReviews] = useState<DesignReview[]>([]);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+
+  function loadReviews() {
+    fetch("/api/v1/design-reviews")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          const mapped = (data.data as ApiReview[]).map(mapApiToReview);
+          setReviews(mapped);
+          if (!selectedId && mapped.length > 0) setSelectedId(mapped[0].id);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(() => { loadReviews(); }, []);
 
   const filtered = useMemo(() => {
-    return REVIEWS.filter((r) => {
+    return reviews.filter((r) => {
       if (activeStatus && r.status !== activeStatus) return false;
       if (search && !r.title.toLowerCase().includes(search.toLowerCase()) && !r.requester.includes(search)) return false;
       return true;
     });
-  }, [activeStatus, search]);
+  }, [reviews, activeStatus, search]);
 
   const statusCounts = useMemo(() => {
     const base = search
-      ? REVIEWS.filter((r) => r.title.toLowerCase().includes(search.toLowerCase()) || r.requester.includes(search))
-      : REVIEWS;
+      ? reviews.filter((r) => r.title.toLowerCase().includes(search.toLowerCase()) || r.requester.includes(search))
+      : reviews;
     return {
       all: base.length,
       "진행중": base.filter((r) => r.status === "진행중").length,
       "수정중": base.filter((r) => r.status === "수정중").length,
       "승인완료": base.filter((r) => r.status === "승인완료").length,
     };
-  }, [search]);
+  }, [reviews, search]);
+
+  const selectedReview = reviews.find((r) => r.id === selectedId);
+
+  if (loading) {
+    return (
+      <>
+        <Header breadcrumb="디자인 리뷰" />
+        <div className={styles.content}>
+          <div className={styles.emptyState}>데이터를 불러오는 중...</div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -186,17 +206,17 @@ export default function DesignReviewPage() {
             <div className={styles.pageTitle}>디자인 리뷰</div>
             <div className={styles.pageSubtitle}>총 {statusCounts.all}건의 리뷰</div>
           </div>
-          <button className={styles.btnPrimary}>
+          <Link href="/design-review/request" className={styles.btnPrimary} style={{ textDecoration: "none" }}>
             <IconPlus size={12} />
             리뷰 요청
-          </button>
+          </Link>
         </div>
 
         {/* Filter Bar */}
         <div className={styles.filterBar}>
           {STATUS_TABS.map((status) => {
             const key = status ?? "all";
-            const label = STATUS_LABELS[key];
+            const label = STATUS_LABELS_MAP[key];
             const count = statusCounts[key as keyof typeof statusCounts];
             return (
               <button
@@ -220,71 +240,326 @@ export default function DesignReviewPage() {
           </div>
         </div>
 
-        {/* Review List */}
-        {filtered.length === 0 && (
-          <div className={styles.emptyState}>검색 결과가 없습니다.</div>
-        )}
-
-        <div className={styles.reviewList}>
-          {filtered.map((review) => (
-            <div key={review.id} className={styles.reviewCard}>
-              <div className={styles.cardTop}>
-                <div className={styles.cardTitleRow}>
-                  <h3 className={styles.cardTitle}>{review.title}</h3>
-                  <span className={`${styles.statusBadge} ${STATUS_STYLE[review.status]}`}>
-                    {review.status}
-                  </span>
+        {/* Main Layout */}
+        <div className={`${styles.mainLayout} ${selectedId ? styles.mainLayoutExpanded : ""}`}>
+          {/* List */}
+          <div className={styles.reviewListPanel}>
+            <div className={styles.listHeader}>
+              <span className={styles.listTitle}>
+                리뷰 목록
+                <span className={styles.listCount}>{filtered.length}</span>
+              </span>
+            </div>
+            <div className={styles.listBody}>
+              {filtered.length === 0 && (
+                <div className={styles.emptyState}>검색 결과가 없습니다.</div>
+              )}
+              {filtered.map((review) => (
+                <div
+                  key={review.id}
+                  className={`${styles.reviewItem} ${review.id === selectedId ? styles.reviewItemActive : ""}`}
+                  onClick={() => setSelectedId(review.id)}
+                >
+                  <div className={styles.reviewItemTop}>
+                    <span className={styles.reviewItemTitle}>{review.title}</span>
+                    <span className={`${styles.statusBadge} ${STATUS_STYLE[review.status]}`}>
+                      {review.status}
+                    </span>
+                  </div>
+                  <div className={styles.reviewItemMeta}>
+                    <span>{review.requester}</span>
+                    <span><IconMessage size={10} /> {review.feedbackCount}</span>
+                    <span><IconCalendar size={10} /> {review.deadline}</span>
+                  </div>
                 </div>
-                <p className={styles.cardDescription}>{review.description}</p>
+              ))}
+            </div>
+          </div>
+
+          {/* Detail Panel */}
+          <div className={styles.detailPanel}>
+            {selectedReview ? (
+              <DetailPanel review={selectedReview} onFeedbackAdded={loadReviews} />
+            ) : (
+              <div className={styles.detailEmpty}>리뷰를 선택하세요</div>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ===== DETAIL PANEL ===== */
+
+
+/* ===== DETAIL PANEL ===== */
+
+function DetailPanel({
+  review,
+  onFeedbackAdded,
+}: {
+  review: DesignReview;
+  onFeedbackAdded: () => void;
+}) {
+  const [selectedImgIdx, setSelectedImgIdx] = useState(0);
+  const [fbContent, setFbContent] = useState("");
+  const [fbAttachments, setFbAttachments] = useState<Attachment[]>([]);
+  const [fbCategory, setFbCategory] = useState("UI");
+  const [fbType, setFbType] = useState("COMMENT");
+  const [fbSubmitting, setFbSubmitting] = useState(false);
+  const [fbAuthorId, setFbAuthorId] = useState("");
+  const [users, setUsers] = useState<{ id: string; name: string; part: string }[]>([]);
+  const feedbackScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetch("/api/v1/users")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setUsers(data.data.items ?? data.data ?? []);
+      })
+      .catch(() => {});
+  }, []);
+
+  // 피드백 목록이 변경되면 최신(맨 아래)으로 스크롤
+  useEffect(() => {
+    const el = feedbackScrollRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [review.feedbacks]);
+
+  async function handleSubmitFeedback() {
+    if (!fbContent.trim() || !fbAuthorId || fbSubmitting) return;
+
+    setFbSubmitting(true);
+    try {
+      // Combine content + attachment references
+      let fullContent = fbContent.trim();
+      if (fbAttachments.length > 0) {
+        fullContent += "\n\n---\n**첨부파일:** " + fbAttachments.map((a) => a.name).join(", ");
+      }
+
+      const res = await fetch("/api/v1/review-feedbacks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reviewId: review.id,
+          authorId: fbAuthorId,
+          content: fullContent,
+          category: fbCategory,
+          type: fbType,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFbContent("");
+        setFbAttachments([]);
+        onFeedbackAdded();
+      }
+    } catch {}
+    finally { setFbSubmitting(false); }
+  }
+
+  const figmaLink = review.figmaUrl || review.figmaProjectUrl;
+
+  return (
+    <>
+      {/* Header */}
+      <div className={styles.detailHeader}>
+        <div className={styles.detailTitleRow}>
+          <div className={styles.detailTitle}>{review.title}</div>
+          <span className={`${styles.statusBadge} ${STATUS_STYLE[review.status]}`}>
+            {review.status}
+          </span>
+        </div>
+        <div className={styles.detailMeta}>
+          <span>요청자: {review.requester}</span>
+          <span>프로젝트: {review.projectName}</span>
+          <span>마감: {review.deadline}</span>
+          <span>{review.createdAt}</span>
+        </div>
+      </div>
+
+      {/* Body - 2 Column */}
+      <div className={styles.detailBody}>
+        {/* Left: Design Preview + Description */}
+        <div className={styles.detailLeft}>
+          {/* Preview Images */}
+          {review.previewImages.length > 0 ? (
+            <div className={styles.previewSection}>
+              <div className={styles.previewMain}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={review.previewImages[selectedImgIdx]?.url}
+                  alt="디자인 미리보기"
+                  className={styles.previewImg}
+                />
+                {review.previewImages[selectedImgIdx]?.reason && (
+                  <div className={styles.previewCaption}>
+                    {review.previewImages[selectedImgIdx].reason}
+                  </div>
+                )}
+              </div>
+              {review.previewImages.length > 1 && (
+                <div className={styles.previewThumbs}>
+                  {review.previewImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`${styles.previewThumb} ${idx === selectedImgIdx ? styles.previewThumbActive : ""}`}
+                      onClick={() => setSelectedImgIdx(idx)}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={img.url} alt="" className={styles.previewThumbImg} />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className={styles.previewEmpty}>
+              <IconPhoto size={20} />
+              <span>미리보기 이미지 없음</span>
+            </div>
+          )}
+
+          {/* Description */}
+          {review.description && (
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>리뷰 설명</div>
+              <div className={styles.descriptionContent}>
+                {review.description.split("\n").map((line, i) => (
+                  <p key={i}>{line || "\u00A0"}</p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Figma link in left column */}
+          {figmaLink && (
+            <a
+              href={figmaLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.btnFigma}
+            >
+              <IconBrandFigma size={14} />
+              Figma에서 보기
+              <IconExternalLink size={11} />
+            </a>
+          )}
+        </div>
+
+        {/* Right: Feedbacks (scroll) + Editor (fixed bottom) */}
+        <div className={styles.detailRight}>
+          {/* Scrollable feedback list */}
+          <div className={styles.detailRightScroll} ref={feedbackScrollRef}>
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>
+                피드백
+                <span className={styles.sectionCount}>{review.feedbacks.length}</span>
               </div>
 
-              <div className={styles.cardMeta}>
-                <div className={styles.metaLeft}>
-                  {/* Figma Link */}
-                  <span className={styles.figmaTag}>
-                    <IconBrandFigma size={13} />
-                    Figma
-                    <IconExternalLink size={11} />
-                  </span>
-
-                  {/* Requester */}
-                  <span className={styles.metaItem}>
-                    <span className={styles.requesterAvatar}>{review.requesterInitial}</span>
-                    {review.requester}
-                  </span>
-
-                  {/* Deadline */}
-                  <span className={styles.metaItem}>
-                    <IconCalendar size={13} />
-                    {review.deadline}
-                  </span>
-
-                  {/* Feedback Count */}
-                  <span className={styles.metaItem}>
-                    <IconMessage size={13} />
-                    {review.feedbackCount}
-                  </span>
+              {review.feedbacks.length === 0 ? (
+                <div className={styles.noFeedback}>
+                  <IconMessagePlus size={16} />
+                  아직 피드백이 없습니다. 첫 번째 피드백을 남겨보세요.
                 </div>
-
-                <div className={styles.metaRight}>
-                  {/* Reviewers */}
-                  <div className={styles.reviewerAvatars}>
-                    {review.reviewers.map((reviewer, i) => (
-                      <div
-                        key={i}
-                        className={styles.reviewerAvatar}
-                        style={{ background: reviewer.bgColor, color: reviewer.color, zIndex: review.reviewers.length - i }}
-                        title={reviewer.name}
-                      >
-                        {reviewer.initial}
+              ) : (
+                <div className={styles.feedbackList}>
+                  {review.feedbacks.map((fb) => (
+                    <div key={fb.id} className={styles.feedbackItem}>
+                      <div className={styles.feedbackHeader}>
+                        <span className={styles.feedbackAuthor}>
+                          <span className={styles.authorInitial}>{fb.author.name.charAt(0)}</span>
+                          {fb.author.name}
+                        </span>
+                        <div className={styles.feedbackBadges}>
+                          <span className={styles.categoryBadge}>
+                            {CATEGORY_LABELS[fb.category] ?? fb.category}
+                          </span>
+                          <span className={`${styles.typeBadge} ${TYPE_STYLE[fb.type] ?? ""}`}>
+                            {fb.type === "APPROVAL" && <IconCheck size={9} />}
+                            {fb.type === "CHANGE_REQUEST" && <IconAlertCircle size={9} />}
+                            {TYPE_LABELS[fb.type] ?? fb.type}
+                          </span>
+                        </div>
                       </div>
+                      <div
+                        className={styles.feedbackContent}
+                        dangerouslySetInnerHTML={{ __html: renderMarkdown(fb.content) }}
+                      />
+                      <div className={styles.feedbackTime}>
+                        {new Date(fb.createdAt).toLocaleDateString("ko-KR")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Fixed editor at bottom */}
+          <div className={styles.detailRightFixed}>
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>피드백 작성</div>
+              <div className={styles.feedbackForm}>
+                <div className={styles.fbFormRow}>
+                  <select
+                    className={styles.fbSelect}
+                    value={fbAuthorId}
+                    onChange={(e) => setFbAuthorId(e.target.value)}
+                  >
+                    <option value="">작성자</option>
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>{u.name} ({u.part})</option>
                     ))}
-                  </div>
+                  </select>
+                  <select
+                    className={styles.fbSelect}
+                    value={fbCategory}
+                    onChange={(e) => setFbCategory(e.target.value)}
+                  >
+                    <option value="UI">UI</option>
+                    <option value="UX">UX</option>
+                    <option value="A11Y">접근성</option>
+                    <option value="TECHNICAL">기술</option>
+                    <option value="OTHER">기타</option>
+                  </select>
+                  <select
+                    className={styles.fbSelect}
+                    value={fbType}
+                    onChange={(e) => setFbType(e.target.value)}
+                  >
+                    <option value="COMMENT">코멘트</option>
+                    <option value="CHANGE_REQUEST">수정 요청</option>
+                    <option value="APPROVAL">승인</option>
+                  </select>
+                </div>
+                <RichEditor
+                  content={fbContent}
+                  onChange={setFbContent}
+                  attachments={fbAttachments}
+                  onAttachmentsChange={setFbAttachments}
+                  placeholder="마크다운으로 피드백을 작성하세요..."
+                  minHeight={80}
+                />
+                <div className={styles.fbActions}>
+                  <button
+                    type="button"
+                    className={styles.btnFeedback}
+                    disabled={!fbContent.trim() || !fbAuthorId || fbSubmitting}
+                    onClick={handleSubmitFeedback}
+                  >
+                    <IconSend size={12} />
+                    {fbSubmitting ? "등록 중..." : "피드백 등록"}
+                  </button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        </div>{/* close detailRight */}
       </div>
     </>
   );

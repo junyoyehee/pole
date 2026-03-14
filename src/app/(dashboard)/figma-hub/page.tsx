@@ -3,7 +3,20 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
-import { IconPlus, IconSearch, IconRefresh } from "@tabler/icons-react";
+import {
+  IconPlus,
+  IconSearch,
+  IconRefresh,
+  IconMessage,
+  IconCode,
+  IconCalendar,
+  IconCheck,
+  IconAlertCircle,
+  IconClock,
+  IconExternalLink,
+  IconBrandFigma,
+  IconX,
+} from "@tabler/icons-react";
 import styles from "./page.module.css";
 
 type DBStatus = "DESIGNING" | "IN_REVIEW" | "IN_DEV" | "DONE";
@@ -22,17 +35,81 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
   완료: "badgeDone",
 };
 
+const REVIEW_STATUS_MAP: Record<string, string> = {
+  OPEN: "진행중",
+  IN_REVISION: "수정중",
+  APPROVED: "승인완료",
+};
+
+const REVIEW_STATUS_CLASS: Record<string, string> = {
+  OPEN: "badgeReview",
+  IN_REVISION: "badgeDesigning",
+  APPROVED: "badgeDone",
+};
+
+const HANDOFF_STATUS_MAP: Record<string, string> = {
+  PENDING: "대기",
+  IN_PROGRESS: "진행중",
+  IMPLEMENTED: "구현완료",
+  VERIFIED: "검증완료",
+};
+
+const HANDOFF_STATUS_CLASS: Record<string, string> = {
+  PENDING: "badgeDesigning",
+  IN_PROGRESS: "badgeReview",
+  IMPLEMENTED: "badgeDev",
+  VERIFIED: "badgeDone",
+};
+
+const PRIORITY_MAP: Record<string, string> = {
+  HIGH: "높음",
+  NORMAL: "보통",
+  LOW: "낮음",
+};
+
 interface FigmaProjectData {
   id: string;
   name: string;
   description: string | null;
-  figmaUrl: string;
-  fileKey: string;
+  figmaUrl: string | null;
+  fileKey: string | null;
   status: DBStatus;
   thumbnailUrl: string | null;
   createdAt: string;
   designer: { id: string; name: string; avatarUrl: string | null; part: string };
   _count: { reviews: number; handoffs: number };
+}
+
+interface ReviewItem {
+  id: string;
+  title: string;
+  status: string;
+  createdAt: string;
+  dueDate: string | null;
+  author: { id: string; name: string };
+  _count: { feedbacks: number };
+}
+
+interface HandoffItem {
+  id: string;
+  componentName: string;
+  status: string;
+  priority: string;
+  createdAt: string;
+  developer: { id: string; name: string };
+}
+
+interface ProjectDetail {
+  id: string;
+  name: string;
+  description: string | null;
+  figmaUrl: string | null;
+  status: DBStatus;
+  thumbnailUrl: string | null;
+  createdAt: string;
+  designer: { id: string; name: string; avatarUrl: string | null; part: string };
+  reviews: ReviewItem[];
+  handoffs: HandoffItem[];
 }
 
 interface RecentExploreItem {
@@ -73,6 +150,9 @@ export default function FigmaHubPage() {
   const [projects, setProjects] = useState<FigmaProjectData[]>([]);
   const [loading, setLoading] = useState(true);
   const [recentExplores, setRecentExplores] = useState<RecentExploreItem[]>([]);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const [detail, setDetail] = useState<ProjectDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
@@ -92,12 +172,27 @@ export default function FigmaHubPage() {
 
   useEffect(() => {
     fetchProjects();
-    // Load recent explores from figma-explorer localStorage
     try {
       const saved = localStorage.getItem("figma-explorer-recent");
       if (saved) setRecentExplores(JSON.parse(saved));
     } catch { /* ignore */ }
   }, [fetchProjects]);
+
+  // Fetch detail when project selected
+  useEffect(() => {
+    if (!selectedId) {
+      setDetail(null);
+      return;
+    }
+    setDetailLoading(true);
+    fetch(`/api/v1/figma-projects/${selectedId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setDetail(data.data);
+      })
+      .catch(() => {})
+      .finally(() => setDetailLoading(false));
+  }, [selectedId]);
 
   const filtered = useMemo(() => {
     return projects.filter((p) => {
@@ -118,7 +213,7 @@ export default function FigmaHubPage() {
       <Header breadcrumb="피그마 허브" />
       <div className={styles.content}>
         {/* Recent Explores */}
-        {recentExplores.length > 0 && (
+        {recentExplores.length > 0 && !selectedId && (
           <div className={styles.recentSection}>
             <div className={styles.recentHeader}>
               <span className={styles.recentTitle}>최근 탐색</span>
@@ -167,10 +262,8 @@ export default function FigmaHubPage() {
             >
               <IconRefresh size={12} />새로고침
             </button>
-            <Link href="/figma-explorer">
-              <button className={styles.btnPrimary}>
-                <IconPlus size={12} />새 프로젝트
-              </button>
+            <Link href="/figma-hub/new" className={styles.btnPrimary} style={{ textDecoration: "none" }}>
+              <IconPlus size={12} />새 프로젝트
             </Link>
           </div>
         </div>
@@ -214,103 +307,284 @@ export default function FigmaHubPage() {
           </div>
         </div>
 
-        {/* Project Grid */}
-        {loading ? (
-          <div className={styles.emptyState}>로딩 중...</div>
-        ) : filtered.length === 0 ? (
-          <div className={styles.emptyState}>
-            {projects.length === 0
-              ? "아직 공유된 Figma 프로젝트가 없습니다. Figma 탐색기에서 디자인을 공유해보세요!"
-              : "검색 결과가 없습니다."}
-          </div>
-        ) : (
-          <div className={styles.projectGrid}>
-            {filtered.map((project) => {
-              const statusLabel = STATUS_MAP[project.status];
-              return (
-                <Link
-                  key={project.id}
-                  href={project.figmaUrl}
-                  target="_blank"
-                  className={styles.projectCard}
-                >
-                  {/* Thumbnail */}
-                  <div
-                    className={styles.projectThumb}
-                    style={
-                      project.thumbnailUrl
-                        ? {
-                            backgroundImage: `url(${project.thumbnailUrl})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                          }
-                        : undefined
-                    }
-                  >
-                    <div className={styles.projectStatusBar}>
-                      <span
-                        className={`${styles.badge} ${styles[STATUS_BADGE_CLASS[statusLabel]]}`}
+        {/* Main Layout: Grid + Detail */}
+        <div className={`${styles.mainLayout} ${selectedId ? styles.mainLayoutExpanded : ""}`}>
+          {/* Project Grid */}
+          <div className={styles.gridPanel}>
+            {loading ? (
+              <div className={styles.emptyState}>로딩 중...</div>
+            ) : filtered.length === 0 ? (
+              <div className={styles.emptyState}>
+                {projects.length === 0
+                  ? "아직 프로젝트가 없습니다. 새 프로젝트를 등록해보세요!"
+                  : "검색 결과가 없습니다."}
+              </div>
+            ) : (
+              <div className={styles.projectGrid}>
+                {filtered.map((project) => {
+                  const statusLabel = STATUS_MAP[project.status];
+                  const isSelected = project.id === selectedId;
+                  return (
+                    <div
+                      key={project.id}
+                      className={`${styles.projectCard} ${isSelected ? styles.projectCardActive : ""}`}
+                      onClick={() => setSelectedId(isSelected ? "" : project.id)}
+                    >
+                      {/* Thumbnail */}
+                      <div
+                        className={styles.projectThumb}
+                        style={
+                          project.thumbnailUrl
+                            ? {
+                                backgroundImage: `url(${project.thumbnailUrl})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                              }
+                            : undefined
+                        }
                       >
-                        {statusLabel}
-                      </span>
-                    </div>
-                    {!project.thumbnailUrl && (
-                      <span className={styles.projectThumbPlaceholder}>
-                        🎨
-                      </span>
-                    )}
-                  </div>
+                        <div className={styles.projectStatusBar}>
+                          <span
+                            className={`${styles.badge} ${styles[STATUS_BADGE_CLASS[statusLabel]]}`}
+                          >
+                            {statusLabel}
+                          </span>
+                        </div>
+                        {!project.thumbnailUrl && (
+                          <span className={styles.projectThumbPlaceholder}>
+                            🎨
+                          </span>
+                        )}
+                      </div>
 
-                  {/* Body */}
-                  <div className={styles.projectBody}>
-                    <div className={styles.projectName}>{project.name}</div>
-                    <div className={styles.projectDesc}>
-                      {project.description || "설명 없음"}
-                    </div>
-                    <div className={styles.projectMeta}>
-                      <div className={styles.projectPeople}>
-                        <div
-                          className={`${styles.projectAvatar} ${styles.avatarDesign}`}
-                        >
-                          {project.designer.name.charAt(0)}
+                      {/* Body */}
+                      <div className={styles.projectBody}>
+                        <div className={styles.projectName}>{project.name}</div>
+                        <div className={styles.projectDesc}>
+                          {project.description || "설명 없음"}
+                        </div>
+                        <div className={styles.projectMeta}>
+                          <div className={styles.projectPeople}>
+                            <div
+                              className={`${styles.projectAvatar} ${styles.avatarDesign}`}
+                            >
+                              {project.designer.name.charAt(0)}
+                            </div>
+                          </div>
+                          <span className={styles.projectDate}>
+                            {timeAgo(project.createdAt)}
+                          </span>
+                        </div>
+                        <div className={styles.handoffBar}>
+                          {project._count.handoffs > 0 ? (
+                            <>
+                              <div
+                                className={`${styles.handoffSeg} ${styles.handoffDone}`}
+                                style={{ flex: project._count.reviews }}
+                              />
+                              <div
+                                className={`${styles.handoffSeg} ${styles.handoffProgress}`}
+                                style={{ flex: project._count.handoffs }}
+                              />
+                            </>
+                          ) : (
+                            <div
+                              className={`${styles.handoffSeg} ${styles.handoffPending}`}
+                              style={{ flex: 1 }}
+                            />
+                          )}
+                        </div>
+                        <div className={styles.handoffLabel}>
+                          리뷰 {project._count.reviews}건 · 핸드오프{" "}
+                          {project._count.handoffs}건
                         </div>
                       </div>
-                      <span className={styles.projectDate}>
-                        {timeAgo(project.createdAt)}
-                      </span>
                     </div>
-
-                    {/* Reviews & Handoffs info */}
-                    <div className={styles.handoffBar}>
-                      {project._count.handoffs > 0 ? (
-                        <>
-                          <div
-                            className={`${styles.handoffSeg} ${styles.handoffDone}`}
-                            style={{ flex: project._count.reviews }}
-                          />
-                          <div
-                            className={`${styles.handoffSeg} ${styles.handoffProgress}`}
-                            style={{ flex: project._count.handoffs }}
-                          />
-                        </>
-                      ) : (
-                        <div
-                          className={`${styles.handoffSeg} ${styles.handoffPending}`}
-                          style={{ flex: 1 }}
-                        />
-                      )}
-                    </div>
-                    <div className={styles.handoffLabel}>
-                      리뷰 {project._count.reviews}건 · 핸드오프{" "}
-                      {project._count.handoffs}건
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Detail Panel */}
+          <div className={styles.detailPanel}>
+            {selectedId && (
+              detailLoading ? (
+                <div className={styles.detailEmpty}>불러오는 중...</div>
+              ) : detail ? (
+                <ProjectDetailPanel
+                  detail={detail}
+                  onClose={() => setSelectedId("")}
+                />
+              ) : (
+                <div className={styles.detailEmpty}>프로젝트 정보를 불러올 수 없습니다.</div>
+              )
+            )}
+          </div>
+        </div>
       </div>
     </>
+  );
+}
+
+/* ===== Project Detail Panel ===== */
+
+function ProjectDetailPanel({
+  detail,
+  onClose,
+}: {
+  detail: ProjectDetail;
+  onClose: () => void;
+}) {
+  const [activeTab, setActiveTab] = useState<"reviews" | "handoffs">("reviews");
+  const statusLabel = STATUS_MAP[detail.status];
+
+  return (
+    <div className={styles.detailContent}>
+      {/* Detail Header */}
+      <div className={styles.detailHeader}>
+        <div className={styles.detailHeaderTop}>
+          <div className={styles.detailTitle}>{detail.name}</div>
+          <button type="button" className={styles.detailClose} onClick={onClose}>
+            <IconX size={14} />
+          </button>
+        </div>
+        <div className={styles.detailMeta}>
+          <span className={`${styles.badge} ${styles[STATUS_BADGE_CLASS[statusLabel]]}`}>
+            {statusLabel}
+          </span>
+          <span className={styles.detailMetaText}>
+            {detail.designer.name} ({detail.designer.part})
+          </span>
+          <span className={styles.detailMetaText}>
+            {new Date(detail.createdAt).toLocaleDateString("ko-KR")}
+          </span>
+        </div>
+        {detail.description && (
+          <div className={styles.detailDesc}>{detail.description}</div>
+        )}
+        {detail.figmaUrl && (
+          <a
+            href={detail.figmaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.btnFigma}
+          >
+            <IconBrandFigma size={12} />
+            Figma에서 보기
+            <IconExternalLink size={10} />
+          </a>
+        )}
+      </div>
+
+      {/* Tabs */}
+      <div className={styles.detailTabs}>
+        <button
+          className={`${styles.detailTab} ${activeTab === "reviews" ? styles.detailTabActive : ""}`}
+          onClick={() => setActiveTab("reviews")}
+        >
+          <IconMessage size={12} />
+          리뷰 <span className={styles.tabCount}>{detail.reviews.length}</span>
+        </button>
+        <button
+          className={`${styles.detailTab} ${activeTab === "handoffs" ? styles.detailTabActive : ""}`}
+          onClick={() => setActiveTab("handoffs")}
+        >
+          <IconCode size={12} />
+          핸드오프 <span className={styles.tabCount}>{detail.handoffs.length}</span>
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className={styles.detailBody}>
+        {activeTab === "reviews" ? (
+          detail.reviews.length === 0 ? (
+            <div className={styles.tabEmpty}>
+              <IconMessage size={18} />
+              <span>등록된 리뷰가 없습니다</span>
+              <Link href="/design-review/request" className={styles.btnSmall}>
+                리뷰 요청하기
+              </Link>
+            </div>
+          ) : (
+            <div className={styles.itemList}>
+              {detail.reviews.map((review) => (
+                <Link
+                  key={review.id}
+                  href="/design-review"
+                  className={styles.itemCard}
+                >
+                  <div className={styles.itemTop}>
+                    <span className={styles.itemTitle}>{review.title}</span>
+                    <span className={`${styles.badge} ${styles[REVIEW_STATUS_CLASS[review.status] ?? "badgeDesigning"]}`}>
+                      {REVIEW_STATUS_MAP[review.status] ?? review.status}
+                    </span>
+                  </div>
+                  <div className={styles.itemMeta}>
+                    <span className={styles.itemMetaItem}>
+                      {review.author.name}
+                    </span>
+                    <span className={styles.itemMetaItem}>
+                      <IconMessage size={10} />
+                      {review._count.feedbacks}
+                    </span>
+                    {review.dueDate && (
+                      <span className={styles.itemMetaItem}>
+                        <IconCalendar size={10} />
+                        {review.dueDate}
+                      </span>
+                    )}
+                    <span className={styles.itemMetaItem}>
+                      <IconClock size={10} />
+                      {timeAgo(review.createdAt)}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )
+        ) : (
+          detail.handoffs.length === 0 ? (
+            <div className={styles.tabEmpty}>
+              <IconCode size={18} />
+              <span>등록된 핸드오프가 없습니다</span>
+              <Link href="/handoff/register" className={styles.btnSmall}>
+                핸드오프 등록하기
+              </Link>
+            </div>
+          ) : (
+            <div className={styles.itemList}>
+              {detail.handoffs.map((handoff) => (
+                <Link
+                  key={handoff.id}
+                  href="/handoff"
+                  className={styles.itemCard}
+                >
+                  <div className={styles.itemTop}>
+                    <span className={styles.itemTitle}>{handoff.componentName}</span>
+                    <span className={`${styles.badge} ${styles[HANDOFF_STATUS_CLASS[handoff.status] ?? "badgeDesigning"]}`}>
+                      {HANDOFF_STATUS_MAP[handoff.status] ?? handoff.status}
+                    </span>
+                  </div>
+                  <div className={styles.itemMeta}>
+                    <span className={styles.itemMetaItem}>
+                      {handoff.developer.name}
+                    </span>
+                    <span className={styles.itemMetaItem}>
+                      <IconAlertCircle size={10} />
+                      {PRIORITY_MAP[handoff.priority] ?? handoff.priority}
+                    </span>
+                    <span className={styles.itemMetaItem}>
+                      <IconClock size={10} />
+                      {timeAgo(handoff.createdAt)}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )
+        )}
+      </div>
+    </div>
   );
 }
