@@ -30,5 +30,6 @@
 - jack: 템플릿 기반 새 프로젝트 (../jack)
 
 ## 프로젝트 관리
-- 전체 프로젝트 관리 가이드: [../project-manager.md](../project-manager.md)
+- 전체 프로젝트 관리 가이드: [../project-docs/project-manager.md](../project-docs/project-manager.md)
+- GitHub: github.com/junyoyehee/project-docs
 - 공통 컨벤션, 기술 스택, 신규 프로젝트 생성 절차 등은 해당 문서를 참고
